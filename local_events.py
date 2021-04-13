@@ -1,8 +1,7 @@
 from pyweatherflowudp.client import WeatherFlowListner
-from aiohttp import ClientSession
+from pyweatherflowudp.const import UNIT_SYSTEM_IMPERIAL, UNIT_SYSTEM_METRIC
 import asyncio
 import logging
-import time
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,6 +29,7 @@ async def devicedata():
         STATION_ID,
         IPADDRESS,
         PORT,
+        UNIT_SYSTEM_METRIC
     )
 
     await wfl.update()

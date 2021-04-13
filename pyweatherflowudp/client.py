@@ -15,6 +15,7 @@ from pyweatherflowudp.const import (
     EVENT_TEMPEST_DATA,
     PROCESSED_EVENT_EMPTY,
     SOCKET_CHECK_INTERVAL_SECONDS,
+    UNIT_SYSTEM_METRIC,
 )
 from pyweatherflowudp.data import (
     WeatherflowStationStateMachine,
@@ -28,11 +29,12 @@ class WeatherFlowListner:
     """Updates device states and attributes."""
 
     def __init__(
-        self, station_id: str, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT
+        self, station_id: str, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT, unit_system: str = UNIT_SYSTEM_METRIC
     ):
         self._station_id = station_id
         self._host = host
         self._port = port
+        self._unit_system = unit_system
 
         self._last_device_update_time = 0
         self._last_udpsocket_check = 0
@@ -146,7 +148,7 @@ class WeatherFlowListner:
                         "event_type": msg_type,
                         "time_epoch_rapid_wind": obs[0],
                         "wind_speed": obs[1],
-                        "wind_direction": obs[2],
+                        "wind_bearing": obs[2],
                     }
                 if msg_type in EVENT_SKY_DATA:
                     obs = msg["obs"][0]
@@ -159,7 +161,7 @@ class WeatherFlowListner:
                         "wind_lull": obs[4],
                         "wind_avg": obs[5],
                         "wind_gust": obs[6],
-                        "wind_direction": obs[7],
+                        "wind_bearing": obs[7],
                         "battery_sky": obs[8],
                         "solar_radiation": obs[10],
                         "local_day_rain_accumulation": obs[11],
@@ -185,7 +187,7 @@ class WeatherFlowListner:
                         "wind_lull": obs[1],
                         "wind_avg": obs[2],
                         "wind_gust": obs[3],
-                        "wind_direction": obs[4],
+                        "wind_bearing": obs[4],
                         "station_pressure": obs[6],
                         "air_temperature": obs[7],
                         "relative_humidity": obs[8],
@@ -206,7 +208,7 @@ class WeatherFlowListner:
 
             if len(data_json) > 0:
                 station_id, processed_station = station_update_from_udp_frames(
-                    self._station_state_machine, self._station_id, data_json
+                    self._station_state_machine, self._station_id, self._unit_system, data_json
                 )
                 if station_id is None:
                     return

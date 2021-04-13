@@ -31,7 +31,8 @@ PROCESSED_EVENT_EMPTY = {
     "time_epoch_air": None,
     "time_epoch_tempest": None,
     "wind_speed": 0,
-    "wind_direction": 0,
+    "wind_bearing": 0,
+    "wind_direction": None,
     "station_pressure": 0,
     "air_temperature": 0,
     "relative_humidity": 0,
@@ -52,4 +53,9 @@ PROCESSED_EVENT_EMPTY = {
     "hub_firmware_revision": None,
     "hub_uptime": None,
     "hub_rssi": 0,
+    "dewpoint": 0,
+    "heatindex": 0,
 }
+
+UNIT_SYSTEM_METRIC = "metric"
+UNIT_SYSTEM_IMPERIAL = "imperial"

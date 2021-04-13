@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name="pyweatherflowudp",
     packages=["pyweatherflowudp"],
-    version="0.0.1",
+    version="0.0.2",
     license="MIT",
     description="Asynchronous Python library to receive UDP Packets from Weatherflow Weatherstations",
     author="Bjarne Riis",
