@@ -213,6 +213,7 @@ class WeatherFlowListner:
                 if station_id is None:
                     return
 
+                processed_station.update(data_json)
                 self.fire_event(self._station_id, processed_station)
             else:
                 _LOGGER.debug("NOT USED msg_type: %s", msg_type)

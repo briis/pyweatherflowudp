@@ -208,7 +208,6 @@ class WeatherflowStationStateMachine:
     def __init__(self):
         """Init the state machine."""
         self._stations = {}
-        self._motion_detected_time = {}
 
     def has_device(self, station_id):
         """Check to see if a device id is in the state machine."""
@@ -219,10 +218,3 @@ class WeatherflowStationStateMachine:
         self._stations.setdefault(station_id, {}).update(new_json)
         return self._stations[station_id]
 
-    def set_motion_detected_time(self, station_id, timestamp):
-        """Set device motion start detected time."""
-        self._motion_detected_time[station_id] = timestamp
-
-    def get_motion_detected_time(self, station_id):
-        """Get device motion start detected time."""
-        return self._motion_detected_time.get(station_id)
