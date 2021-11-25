@@ -17,7 +17,7 @@ class Event:
 
     @property
     def epoch(self) -> int:
-        "Return epoch in seconds."
+        """Return epoch in seconds."""
         return self._epoch
 
     @property
@@ -46,7 +46,8 @@ class LightningStrikeEvent(Event):
     def energy(self) -> float:
         """Return the energy.
 
-        Energy is just a pure number and has no physical meaning."""
+        Energy is just a pure number and has no physical meaning.
+        """
         return self._energy
 
     def __repr__(self) -> str:  # pragma: no cover

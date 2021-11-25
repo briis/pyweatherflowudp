@@ -104,8 +104,7 @@ class Endpoint:
         self._transport.sendto(data, addr)
 
     async def receive(self) -> tuple[bytes, tuple[str, int]]:
-        """Wait for an incoming datagram and return it with
-        the corresponding address.
+        """Wait for an incoming datagram and return it with the corresponding address.
 
         This method is a coroutine.
         """
@@ -132,12 +131,12 @@ class Endpoint:
 
     @property
     def address(self) -> Any:
-        """The endpoint address as a (host, port) tuple."""
+        """Endpoint address as a (host, port) tuple."""
         return self._transport.get_extra_info("socket").getsockname()
 
     @property
     def closed(self) -> bool:
-        """Indicates whether the endpoint is closed or not."""
+        """Indicate whether the endpoint is closed or not."""
         return self._closed
 
 

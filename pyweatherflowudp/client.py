@@ -44,7 +44,7 @@ class WeatherFlowListener(EventMixin):
         if self._udp_task is not None:
             return
 
-        self._udp_task = asyncio.ensure_future(self._setup_socketreader())
+        self._udp_task = asyncio.ensure_future(self._start_socketreader())
         _LOGGER.debug("Started listening")
 
     async def stop_listening(self) -> None:
@@ -64,8 +64,8 @@ class WeatherFlowListener(EventMixin):
             self._udp_task = None
             _LOGGER.debug("Stopped listening")
 
-    async def _setup_socketreader(self) -> None:
-        """Setup the UDP Socket Listener."""
+    async def _start_socketreader(self) -> None:
+        """Start the UDP socket listener."""
         self._udp_connection = await open_local_endpoint(
             host=self._host, port=self._port
         )
