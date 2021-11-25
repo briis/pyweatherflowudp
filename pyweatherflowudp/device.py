@@ -183,10 +183,10 @@ class HubDevice(WeatherFlowDevice):
                 EVENT_LOAD_COMPLETE,
                 CustomEvent(self._timestamp, EVENT_LOAD_COMPLETE),
             )
-        else:
-            self.emit(
-                EVENT_STATUS_UPDATE, CustomEvent(self._timestamp, EVENT_STATUS_UPDATE)
-            )
+
+        self.emit(
+            EVENT_STATUS_UPDATE, CustomEvent(self._timestamp, EVENT_STATUS_UPDATE)
+        )
 
 
 class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
@@ -265,11 +265,11 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         if not self._initial_status:
             self._initial_status = True
             self._send_load_complete_event()
-        else:
-            assert self._timestamp
-            self.emit(
-                EVENT_STATUS_UPDATE, CustomEvent(self._timestamp, EVENT_STATUS_UPDATE)
-            )
+
+        assert self._timestamp
+        self.emit(
+            EVENT_STATUS_UPDATE, CustomEvent(self._timestamp, EVENT_STATUS_UPDATE)
+        )
 
     def parse_observation(self, data: list[list]) -> None:
         """Parse observation data."""
@@ -280,11 +280,9 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         if not self._initital_observation:
             self._initital_observation = True
             self._send_load_complete_event()
-        else:
-            assert self._last_report
-            self.emit(
-                EVENT_OBSERVATION, CustomEvent(self._last_report, EVENT_STATUS_UPDATE)
-            )
+
+        assert self._last_report
+        self.emit(EVENT_OBSERVATION, CustomEvent(self._last_report, EVENT_OBSERVATION))
 
     def _send_load_complete_event(self) -> None:
         if self._initial_status and self._initital_observation:

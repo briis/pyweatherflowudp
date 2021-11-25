@@ -132,7 +132,7 @@ class SkySensorMixin(BaseSensorMixin):
 
     @property
     def solar_radiation(self) -> int:
-        """Return the solar radiation in watts per square meter (W/m²)."""
+        """Return the solar radiation in watts per square meter (W/m^2)."""
         return self._solar_radiation
 
     @property
