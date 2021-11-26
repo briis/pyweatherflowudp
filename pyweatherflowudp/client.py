@@ -9,6 +9,7 @@ from typing import Any
 from .aioudp import LocalEndpoint, open_local_endpoint
 from .const import DEFAULT_HOST, DEFAULT_PORT
 from .device import WeatherFlowDevice, detmine_device
+from .errors import AddressInUseError, EndpointError
 from .mixins import EventMixin
 
 DATA_HUB_SN = "hub_sn"
@@ -44,8 +45,16 @@ class WeatherFlowListener(EventMixin):
         if self._udp_task is not None:
             return
 
-        self._udp_task = asyncio.ensure_future(self._start_socketreader())
+        try:
+            self._udp_connection = await open_local_endpoint(
+                host=self._host, port=self._port
+            )
+        except OSError as e:
+            if "Address already in use" in e.args:
+                raise AddressInUseError("Address already in use") from e
+            raise EndpointError("Could not open a local UDP endpoint") from e
         _LOGGER.debug("Started listening")
+        self._udp_task = asyncio.ensure_future(self._start_socketreader())
 
     async def stop_listening(self) -> None:
         """Disconnect the socket."""
@@ -66,11 +75,6 @@ class WeatherFlowListener(EventMixin):
 
     async def _start_socketreader(self) -> None:
         """Start the UDP socket listener."""
-        self._udp_connection = await open_local_endpoint(
-            host=self._host, port=self._port
-        )
-        assert self._udp_connection
-
         while not self._udp_connection.closed:
             data, (host, port) = await self._udp_connection.receive()
             _LOGGER.debug("Received message from %s:%s - %s", host, port, data)

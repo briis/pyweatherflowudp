@@ -12,6 +12,7 @@ from pyweatherflowudp.device import (
     SkySensorType,
     WeatherFlowDevice,
 )
+from pyweatherflowudp.errors import ListenerError
 from pyweatherflowudp.event import Event
 
 logging.basicConfig(level=logging.INFO)
@@ -22,11 +23,11 @@ async def main():
 
     def device_discovered(device: WeatherFlowDevice):
         """Handle a discovered device."""
-        logging.info("Found device: %s", device)
+        print("Found device:", device)
 
         def device_event(event: Event):
             """Handle an event."""
-            logging.info("%s from %s", event, device)
+            print(event, "from", device)
 
         event_lambda = lambda event: device_event(event)
         device.on(EVENT_LOAD_COMPLETE, event_lambda)
@@ -38,10 +39,12 @@ async def main():
             device.on(EVENT_RAIN_START, event_lambda)
             device.on(EVENT_RAPID_WIND, event_lambda)
 
-    async with WeatherFlowListener() as client:
-        client.on(EVENT_DEVICE_DISCOVERED, lambda device: device_discovered(device))
-        await asyncio.sleep(60)
-        await client.stop_listening()
+    try:
+        async with WeatherFlowListener() as client:
+            client.on(EVENT_DEVICE_DISCOVERED, lambda device: device_discovered(device))
+            await asyncio.sleep(60)
+    except ListenerError as e:
+        print(e)
 
 
 if __name__ == "__main__":
