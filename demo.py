@@ -43,8 +43,8 @@ async def main():
         async with WeatherFlowListener() as client:
             client.on(EVENT_DEVICE_DISCOVERED, lambda device: device_discovered(device))
             await asyncio.sleep(60)
-    except ListenerError as e:
-        print(e)
+    except ListenerError as ex:
+        print(ex)
 
 
 if __name__ == "__main__":

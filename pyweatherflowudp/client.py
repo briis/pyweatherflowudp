@@ -49,10 +49,10 @@ class WeatherFlowListener(EventMixin):
             self._udp_connection = await open_local_endpoint(
                 host=self._host, port=self._port
             )
-        except OSError as e:
-            if "Address already in use" in e.args:
-                raise AddressInUseError("Address already in use") from e
-            raise EndpointError("Could not open a local UDP endpoint") from e
+        except OSError as ex:
+            if "Address already in use" in ex.args:
+                raise AddressInUseError("Address already in use") from ex
+            raise EndpointError("Could not open a local UDP endpoint") from ex
         _LOGGER.debug("Started listening")
         self._udp_task = asyncio.ensure_future(self._start_socketreader())
 
@@ -75,6 +75,7 @@ class WeatherFlowListener(EventMixin):
 
     async def _start_socketreader(self) -> None:
         """Start the UDP socket listener."""
+        assert self._udp_connection
         while not self._udp_connection.closed:
             data, (host, port) = await self._udp_connection.receive()
             _LOGGER.debug("Received message from %s:%s - %s", host, port, data)

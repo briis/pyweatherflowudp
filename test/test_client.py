@@ -2,9 +2,13 @@
 import asyncio
 import json
 from typing import Any
+from unittest.mock import patch
+
+import pytest
 
 from pyweatherflowudp.aioudp import RemoteEndpoint
 from pyweatherflowudp.client import WeatherFlowListener
+from pyweatherflowudp.errors import AddressInUseError
 
 
 async def test_listen_and_stop(listener: WeatherFlowListener) -> None:
@@ -41,3 +45,12 @@ async def test_process_message(
     remote_endpoint.send(bytes(json.dumps(device_status), "UTF-8"))
     await asyncio.sleep(0.1)
     await listener.stop_listening()
+
+
+async def test_listener_connection_errors(listener: WeatherFlowListener) -> None:
+    """Test listener connection errors."""
+    with patch(
+        "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
+        side_effect=OSError(48, "Address already in use"),
+    ), pytest.raises(AddressInUseError):
+        await listener.start_listening()
