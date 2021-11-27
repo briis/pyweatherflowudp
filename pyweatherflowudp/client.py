@@ -83,9 +83,14 @@ class WeatherFlowListener(EventMixin):
 
     def _process_message(self, data: bytes) -> None:
         """Process a UDP message."""
-        json_data: dict[str, Any] = json.loads(data)
+        try:
+            json_data: dict[str, Any] = json.loads(data)
+            serial_number = json_data[DATA_SERIAL_NUMBER]
+        except (json.JSONDecodeError, KeyError):
+            _LOGGER.warning("Received unknown message: %s", data)
+            return
 
-        if (serial_number := json_data[DATA_SERIAL_NUMBER]) not in self._devices:
+        if serial_number not in self._devices:
             self._devices[serial_number] = detmine_device(serial_number)(
                 serial_number=serial_number, data=json_data
             )

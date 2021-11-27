@@ -90,6 +90,11 @@ class WeatherFlowDevice(EventMixin):
         return str(self._firmware_revision)
 
     @property
+    def load_complete(self) -> bool:
+        """Return `True` if the device has been completely loaded."""
+        return self._initial_status
+
+    @property
     def model(self) -> str:
         """Return the model."""
         return self._attr_model
@@ -219,7 +224,7 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         self._hub_rssi: int = 0
         self._sensor_status: int = 0
         self._debug: bool = False
-        self._initital_observation: bool = False
+        self._initial_observation: bool = False
 
         self.register_parse_handlers(
             {
@@ -233,9 +238,19 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         return f"{self.model}<serial_number={self.serial_number}, hub={self.hub_sn}>"
 
     @property
+    def hub_rssi(self) -> int:
+        """Return the hub rssi."""
+        return self._hub_rssi
+
+    @property
     def hub_sn(self) -> str | None:
         """Return the hub serial number."""
         return self._hub_sn
+
+    @property
+    def load_complete(self) -> bool:
+        """Return `True` if the device has been completely loaded."""
+        return self._initial_status and self._initial_observation
 
     @property
     def sensor_status(self) -> list[str]:
@@ -277,15 +292,15 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
             for idx, field in self.OBSERVATION_VALUES_MAP.items():
                 setattr(self, field, observation[idx])
 
-        if not self._initital_observation:
-            self._initital_observation = True
+        if not self._initial_observation:
+            self._initial_observation = True
             self._send_load_complete_event()
 
         assert self._last_report
         self.emit(EVENT_OBSERVATION, CustomEvent(self._last_report, EVENT_OBSERVATION))
 
     def _send_load_complete_event(self) -> None:
-        if self._initial_status and self._initital_observation:
+        if self._initial_status and self._initial_observation:
             assert self._last_report
             assert self._timestamp
             self.emit(

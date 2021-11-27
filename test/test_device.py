@@ -4,6 +4,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
+import pytest
+
 from pyweatherflowudp.device import (
     DATA_OBSERVATIONS,
     EVENT_LOAD_COMPLETE,
@@ -27,8 +29,9 @@ def test_hub_device(hub_status: dict[str, Any]) -> None:
     assert device.model == "Hub"
     assert device.serial_number == HUB_SERIAL_NUMBER
 
-    assert device.rssi == 0
+    assert not device.load_complete
     device.parse_message(hub_status)
+    assert device.load_complete
     assert device.rssi == -62
     assert device.firmware_revision == "35"
     assert device.timestamp == datetime.fromtimestamp(1495724691, timezone.utc)
@@ -101,12 +104,14 @@ def test_tempest_device(
 
     def load_complete(event):
         assert event
+        assert device.load_complete
 
     unsubscribe = device.on(EVENT_LOAD_COMPLETE, lambda event: load_complete(event))
 
     assert device.rssi == 0
     device.parse_message(device_status)
     assert device.rssi == -17
+    assert device.hub_rssi == -87
     assert device.sensor_status == []
 
     device_status.update({"rssi": -21})
@@ -152,7 +157,7 @@ def test_tempest_device(
     unsubscribe()
 
 
-def test_alternate_parse_message_paths(caplog):
+def test_alternate_parse_message_paths(caplog: pytest.LogCaptureFixture):
     device = HubDevice(serial_number=HUB_SERIAL_NUMBER)
     device.parse_message({"type": "no_handler"})
     assert "Unhandled no_handler message" in caplog.text

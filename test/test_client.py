@@ -54,3 +54,21 @@ async def test_listener_connection_errors(listener: WeatherFlowListener) -> None
         side_effect=OSError(48, "Address already in use"),
     ), pytest.raises(AddressInUseError):
         await listener.start_listening()
+
+
+async def test_invalid_messages(
+    listener: WeatherFlowListener,
+    remote_endpoint: RemoteEndpoint,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test invalid messages received by the listener."""
+    await listener.start_listening()
+    await asyncio.sleep(0.1)
+
+    for invalid_message in [json.dumps({}), "blahblahblah"]:
+        remote_endpoint.send(bytes(invalid_message, "UTF-8"))
+        await asyncio.sleep(0.1)
+        assert "Received unknown message" in caplog.text
+
+    await listener.stop_listening()
+    assert not listener.is_listening
