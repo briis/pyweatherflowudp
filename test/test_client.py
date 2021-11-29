@@ -1,14 +1,19 @@
 """Test client listener behavior."""
+from __future__ import annotations
+
 import asyncio
 import json
 from typing import Any
 from unittest.mock import patch
 
 import pytest
+from _pytest.logging import LogCaptureFixture
 
 from pyweatherflowudp.aioudp import RemoteEndpoint
 from pyweatherflowudp.client import WeatherFlowListener
 from pyweatherflowudp.errors import AddressInUseError
+
+pytestmark = pytest.mark.asyncio
 
 
 async def test_listen_and_stop(listener: WeatherFlowListener) -> None:
@@ -59,7 +64,7 @@ async def test_listener_connection_errors(listener: WeatherFlowListener) -> None
 async def test_invalid_messages(
     listener: WeatherFlowListener,
     remote_endpoint: RemoteEndpoint,
-    caplog: pytest.LogCaptureFixture,
+    caplog: LogCaptureFixture,
 ) -> None:
     """Test invalid messages received by the listener."""
     await listener.start_listening()

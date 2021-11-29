@@ -3,6 +3,7 @@ import json
 from typing import Any
 
 import pytest
+
 from pyweatherflowudp.aioudp import (
     RemoteEndpoint,
     open_local_endpoint,
@@ -62,7 +63,7 @@ def obs_st_fixture() -> dict[str, Any]:
 
 
 @pytest.fixture(name="local_address")
-async def local_address_fixture(loop) -> tuple[str, int]:
+async def local_address_fixture() -> tuple[str, int]:
     """Get a local endpoint address."""
     local = await open_local_endpoint()
     local.abort()
@@ -72,9 +73,7 @@ async def local_address_fixture(loop) -> tuple[str, int]:
 
 
 @pytest.fixture(name="remote_endpoint")
-async def remote_endpoint_fixture(
-    loop, local_address: tuple[str, int]
-) -> RemoteEndpoint:
+async def remote_endpoint_fixture(local_address: tuple[str, int]) -> RemoteEndpoint:
     """Create a local endpoint."""
     return await open_remote_endpoint(*local_address)
 

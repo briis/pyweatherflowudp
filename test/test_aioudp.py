@@ -5,6 +5,8 @@ import pytest
 
 from pyweatherflowudp.aioudp import open_local_endpoint, open_remote_endpoint
 
+pytestmark = pytest.mark.asyncio
+
 
 async def test_standard_behavior() -> None:
     """Test standard behavior."""

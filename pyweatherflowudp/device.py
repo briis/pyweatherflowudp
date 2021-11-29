@@ -5,6 +5,8 @@ import logging
 from datetime import datetime
 from typing import Any, Callable, final
 
+from pint import Quantity
+
 from .const import (
     EVENT_OBSERVATION_AIR,
     EVENT_OBSERVATION_SKY,
@@ -14,6 +16,7 @@ from .const import (
     EVENT_STATUS_DEVICE,
     EVENT_STATUS_HUB,
     EVENT_STRIKE,
+    UNIT_DECIBELS,
 )
 from .event import CustomEvent, LightningStrikeEvent, RainStartEvent, WindEvent
 from .helpers import truebool, utc_timestamp_from_epoch
@@ -100,9 +103,9 @@ class WeatherFlowDevice(EventMixin):
         return self._attr_model
 
     @property
-    def rssi(self) -> int:
+    def rssi(self) -> Quantity:
         """Return the rssi."""
-        return self._rssi
+        return self._rssi * UNIT_DECIBELS
 
     @property
     def serial_number(self) -> str:
@@ -238,9 +241,9 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         return f"{self.model}<serial_number={self.serial_number}, hub={self.hub_sn}>"
 
     @property
-    def hub_rssi(self) -> int:
+    def hub_rssi(self) -> Quantity:
         """Return the hub rssi."""
-        return self._hub_rssi
+        return self._hub_rssi * UNIT_DECIBELS
 
     @property
     def hub_sn(self) -> str | None:

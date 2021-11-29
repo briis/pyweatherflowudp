@@ -4,6 +4,22 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Callable
 
+import metpy.calc as mpcalc
+from pint import Quantity
+
+from .const import (
+    UNIT_DEGREES,
+    UNIT_DEGREES_CELSIUS,
+    UNIT_IRRADIATION,
+    UNIT_KILOMETERS,
+    UNIT_LUX,
+    UNIT_METERS_PER_SECOND,
+    UNIT_MILLIBARS,
+    UNIT_MILLIMETERS_PER_MINUTE,
+    UNIT_MINUTES,
+    UNIT_PERCENT,
+    UNIT_VOLTS,
+)
 from .enums import PrecipitationType
 from .event import LightningStrikeEvent
 from .helpers import utc_timestamp_from_epoch
@@ -45,9 +61,9 @@ class BaseSensorMixin:
     _report_interval: int = 0
 
     @property
-    def battery(self) -> float:
+    def battery(self) -> Quantity:
         """Return the battery in volts (V)."""
-        return self._battery
+        return self._battery * UNIT_VOLTS
 
     @property
     def last_report(self) -> datetime | None:
@@ -55,9 +71,9 @@ class BaseSensorMixin:
         return utc_timestamp_from_epoch(self._last_report)
 
     @property
-    def report_interval(self) -> int:
+    def report_interval(self) -> Quantity:
         """Return the report interval in minutes."""
-        return self._report_interval
+        return self._report_interval * UNIT_MINUTES
 
 
 class AirSensorMixin(BaseSensorMixin):
@@ -71,9 +87,9 @@ class AirSensorMixin(BaseSensorMixin):
     _station_pressure: float = 0
 
     @property
-    def air_temperature(self) -> float:
-        """Return the air temperature in degrees Celsius."""
-        return self._air_temperature
+    def air_temperature(self) -> Quantity:
+        """Return the air temperature in degrees Celsius (°C)."""
+        return self._air_temperature * UNIT_DEGREES_CELSIUS
 
     @property
     def last_lightning_strike_event(self) -> LightningStrikeEvent | None:
@@ -81,9 +97,11 @@ class AirSensorMixin(BaseSensorMixin):
         return self._last_lightning_strike_event
 
     @property
-    def lightning_strike_average_distance(self) -> float:
+    def lightning_strike_average_distance(
+        self,
+    ) -> Quantity:
         """Return the lightning strike average distance in kilometers (km)."""
-        return self._lightning_strike_average_distance
+        return self._lightning_strike_average_distance * UNIT_KILOMETERS
 
     @property
     def lightning_strike_count(self) -> int:
@@ -91,14 +109,19 @@ class AirSensorMixin(BaseSensorMixin):
         return self._lightning_strike_count
 
     @property
-    def relative_humidity(self) -> float:
+    def relative_humidity(self) -> Quantity:
         """Return the relative humidity percentage."""
-        return self._relative_humidity
+        return self._relative_humidity * UNIT_PERCENT
 
     @property
-    def station_pressure(self) -> float:
-        """Return the station pressure in millibars."""
-        return self._station_pressure
+    def station_pressure(self) -> Quantity:
+        """Return the station pressure in millibars (mbar)."""
+        return self._station_pressure * UNIT_MILLIBARS
+
+    @property
+    def air_density(self) -> Quantity:
+        """Return the calculated air density in kilograms per cubic meter (kg/m³)."""
+        return mpcalc.density(self.station_pressure, self.air_temperature, 0)
 
 
 class SkySensorMixin(BaseSensorMixin):
@@ -116,9 +139,9 @@ class SkySensorMixin(BaseSensorMixin):
     _wind_sample_interval: int = 0
 
     @property
-    def illuminance(self) -> int:
+    def illuminance(self) -> Quantity:
         """Return the illuminance is lux (lx)."""
-        return self._illuminance
+        return self._illuminance * UNIT_LUX
 
     @property
     def precipitation_type(self) -> PrecipitationType:
@@ -126,14 +149,16 @@ class SkySensorMixin(BaseSensorMixin):
         return PrecipitationType(self._precipitation_type)
 
     @property
-    def rain_amount_previous_minute(self) -> float:
-        """Return the rain amount over previous minute in millimeters (mm)."""
-        return self._rain_amount_previous_minute
+    def rain_amount_previous_minute(
+        self,
+    ) -> Quantity:
+        """Return the rain amount over previous minute in millimeters (mm/min)."""
+        return self._rain_amount_previous_minute * UNIT_MILLIMETERS_PER_MINUTE
 
     @property
-    def solar_radiation(self) -> int:
-        """Return the solar radiation in watts per square meter (W/m^2)."""
-        return self._solar_radiation
+    def solar_radiation(self) -> Quantity:
+        """Return the solar radiation in watts per square meter (W/m²)."""
+        return self._solar_radiation * UNIT_IRRADIATION
 
     @property
     def uv(self) -> float:  # pylint: disable=invalid-name
@@ -141,26 +166,26 @@ class SkySensorMixin(BaseSensorMixin):
         return self._uv
 
     @property
-    def wind_average(self) -> float:
+    def wind_average(self) -> Quantity:
         """Return the wind average in meters per second (m/s)."""
-        return self._wind_average
+        return self._wind_average * UNIT_METERS_PER_SECOND
 
     @property
-    def wind_direction(self) -> int:
+    def wind_direction(self) -> Quantity:
         """Return the wind direction in degrees."""
-        return self._wind_direction
+        return self._wind_direction * UNIT_DEGREES
 
     @property
-    def wind_gust(self) -> float:
+    def wind_gust(self) -> Quantity:
         """Return the wind gust in meters per second (m/s)."""
-        return self._wind_gust
+        return self._wind_gust * UNIT_METERS_PER_SECOND
 
     @property
-    def wind_lull(self) -> float:
+    def wind_lull(self) -> Quantity:
         """Return the wind lull in meters per second (m/s)."""
-        return self._wind_lull
+        return self._wind_lull * UNIT_METERS_PER_SECOND
 
     @property
-    def wind_sample_interval(self) -> int:
+    def wind_sample_interval(self) -> Quantity:
         """Return wind sample interval in seconds."""
-        return self._wind_sample_interval
+        return self._wind_sample_interval * UNIT_MINUTES

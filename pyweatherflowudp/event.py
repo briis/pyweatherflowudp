@@ -4,6 +4,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+from pint import Quantity
+
+from .const import UNIT_DEGREES, UNIT_KILOMETERS, UNIT_METERS_PER_SECOND
 from .helpers import utc_timestamp_from_epoch
 
 # pylint: disable=line-too-long
@@ -38,12 +41,12 @@ class LightningStrikeEvent(Event):
     _energy: int
 
     @property
-    def distance(self) -> int:
+    def distance(self) -> Quantity:
         """Return the distance in kilometers."""
-        return self._distance
+        return self._distance * UNIT_KILOMETERS
 
     @property
-    def energy(self) -> float:
+    def energy(self) -> int:
         """Return the energy.
 
         Energy is just a pure number and has no physical meaning.
@@ -52,7 +55,9 @@ class LightningStrikeEvent(Event):
 
     def __repr__(self) -> str:  # pragma: no cover
         """Return repr(self)."""
-        return f"Lightning Strike Event<timestamp={self.timestamp}, speed={self.distance} km>"
+        return (
+            f"Lightning Strike Event<timestamp={self.timestamp}, speed={self.distance}>"
+        )
 
 
 @dataclass
@@ -72,18 +77,18 @@ class WindEvent(Event):
     _direction: int
 
     @property
-    def direction(self) -> int:
+    def direction(self) -> Quantity:
         """Return the direction in degrees."""
-        return self._direction
+        return self._direction * UNIT_DEGREES
 
     @property
-    def speed(self) -> float:
+    def speed(self) -> Quantity:
         """Return the speed in meters per second."""
-        return self._speed
+        return self._speed * UNIT_METERS_PER_SECOND
 
     def __repr__(self) -> str:  # pragma: no cover
         """Return repr(self)."""
-        return f"Wind Event<timestamp={self.timestamp}, speed={self.speed} m/s, direction={self.direction}°>"
+        return f"Wind Event<timestamp={self.timestamp}, speed={self.speed}, direction={self.direction.m}°>"
 
 
 @dataclass
