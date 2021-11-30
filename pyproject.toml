@@ -1,9 +1,13 @@
 [tool.poetry]
 name = "pyweatherflowudp"
 version = "0.1.0"
-description = ""
-authors = ["Nathan Spencer <natekspencer@gmail.com>"]
+description = "An event-based asynchronous library to read UDP packets from Weatherflow weather systems on a local network without any reliance on the cloud."
 license = "MIT"
+authors = ["Nathan Spencer <natekspencer@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/briis/pyweatherflowudp"
+repository = "https://github.com/briis/pyweatherflowudp"
+keywords = ["WeatherFlow", "UDP", "asynchronous", "local"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
