@@ -17,6 +17,7 @@ from .const import (
     EVENT_STATUS_HUB,
     EVENT_STRIKE,
     UNIT_DECIBELS,
+    UNIT_SECONDS,
 )
 from .event import CustomEvent, LightningStrikeEvent, RainStartEvent, WindEvent
 from .helpers import truebool, utc_timestamp_from_epoch
@@ -103,7 +104,7 @@ class WeatherFlowDevice(EventMixin):
         return self._attr_model
 
     @property
-    def rssi(self) -> Quantity:
+    def rssi(self) -> Quantity[int]:
         """Return the rssi."""
         return self._rssi * UNIT_DECIBELS
 
@@ -118,9 +119,18 @@ class WeatherFlowDevice(EventMixin):
         return utc_timestamp_from_epoch(self._timestamp)
 
     @property
-    def uptime(self) -> int:
-        """Return the uptime."""
-        return self._uptime
+    def up_since(self) -> datetime | None:
+        """Return the device's up since timestamp in UTC."""
+        return (
+            None
+            if self._timestamp is None
+            else utc_timestamp_from_epoch(self._timestamp - self._uptime)
+        )
+
+    @property
+    def uptime(self) -> Quantity[int]:
+        """Return the uptime in seconds."""
+        return self._uptime * UNIT_SECONDS
 
     def register_parse_handlers(
         self, message_handlers: dict[str, Callable | tuple[Callable, str]]
@@ -241,7 +251,7 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         return f"{self.model}<serial_number={self.serial_number}, hub={self.hub_sn}>"
 
     @property
-    def hub_rssi(self) -> Quantity:
+    def hub_rssi(self) -> Quantity[int]:
         """Return the hub rssi."""
         return self._hub_rssi * UNIT_DECIBELS
 

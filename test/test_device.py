@@ -19,6 +19,7 @@ from pyweatherflowudp.const import (
     UNIT_MILLIMETERS_PER_MINUTE,
     UNIT_MINUTES,
     UNIT_PERCENT,
+    UNIT_SECONDS,
     UNIT_VOLTS,
 )
 from pyweatherflowudp.device import (
@@ -50,7 +51,8 @@ def test_hub_device(hub_status: dict[str, Any]) -> None:
     assert device.rssi == -62 * UNIT_DECIBELS
     assert device.firmware_revision == "35"
     assert device.timestamp == datetime.fromtimestamp(1495724691, timezone.utc)
-    assert device.uptime == 1670133
+    assert device.up_since == datetime.fromtimestamp(1495724691 - 1670133, timezone.utc)
+    assert device.uptime == 1670133 * UNIT_SECONDS
     assert device.reset_flags == ["Brownout reset", "PIN reset", "Power reset"]
 
     hub_status.update({"timestamp": 1495725691})

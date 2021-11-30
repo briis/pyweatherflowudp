@@ -27,4 +27,5 @@ UNIT_MILLIBARS = units.mbar
 UNIT_MILLIMETERS_PER_MINUTE = units.mm / units.min
 UNIT_MINUTES = units.min
 UNIT_PERCENT = units.percent
+UNIT_SECONDS = units.sec
 UNIT_VOLTS = units.V

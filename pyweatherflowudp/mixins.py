@@ -61,7 +61,7 @@ class BaseSensorMixin:
     _report_interval: int = 0
 
     @property
-    def battery(self) -> Quantity:
+    def battery(self) -> Quantity[float]:
         """Return the battery in volts (V)."""
         return self._battery * UNIT_VOLTS
 
@@ -71,7 +71,7 @@ class BaseSensorMixin:
         return utc_timestamp_from_epoch(self._last_report)
 
     @property
-    def report_interval(self) -> Quantity:
+    def report_interval(self) -> Quantity[int]:
         """Return the report interval in minutes."""
         return self._report_interval * UNIT_MINUTES
 
@@ -87,7 +87,7 @@ class AirSensorMixin(BaseSensorMixin):
     _station_pressure: float = 0
 
     @property
-    def air_temperature(self) -> Quantity:
+    def air_temperature(self) -> Quantity[float]:
         """Return the air temperature in degrees Celsius (°C)."""
         return self._air_temperature * UNIT_DEGREES_CELSIUS
 
@@ -99,7 +99,7 @@ class AirSensorMixin(BaseSensorMixin):
     @property
     def lightning_strike_average_distance(
         self,
-    ) -> Quantity:
+    ) -> Quantity[float]:
         """Return the lightning strike average distance in kilometers (km)."""
         return self._lightning_strike_average_distance * UNIT_KILOMETERS
 
@@ -109,17 +109,17 @@ class AirSensorMixin(BaseSensorMixin):
         return self._lightning_strike_count
 
     @property
-    def relative_humidity(self) -> Quantity:
+    def relative_humidity(self) -> Quantity[float]:
         """Return the relative humidity percentage."""
         return self._relative_humidity * UNIT_PERCENT
 
     @property
-    def station_pressure(self) -> Quantity:
+    def station_pressure(self) -> Quantity[float]:
         """Return the station pressure in millibars (mbar)."""
         return self._station_pressure * UNIT_MILLIBARS
 
     @property
-    def air_density(self) -> Quantity:
+    def air_density(self) -> Quantity[float]:
         """Return the calculated air density in kilograms per cubic meter (kg/m³)."""
         return mpcalc.density(self.station_pressure, self.air_temperature, 0)
 
@@ -141,7 +141,7 @@ class SkySensorMixin(BaseSensorMixin):
     _wind_sample_interval: int = 0
 
     @property
-    def illuminance(self) -> Quantity:
+    def illuminance(self) -> Quantity[int]:
         """Return the illuminance is lux (lx)."""
         return self._illuminance * UNIT_LUX
 
@@ -163,12 +163,12 @@ class SkySensorMixin(BaseSensorMixin):
     @property
     def rain_amount_previous_minute(
         self,
-    ) -> Quantity:
+    ) -> Quantity[float]:
         """Return the rain amount over previous minute in millimeters (mm/min)."""
         return self._rain_amount_previous_minute * UNIT_MILLIMETERS_PER_MINUTE
 
     @property
-    def solar_radiation(self) -> Quantity:
+    def solar_radiation(self) -> Quantity[int]:
         """Return the solar radiation in watts per square meter (W/m²)."""
         return self._solar_radiation * UNIT_IRRADIATION
 
@@ -178,26 +178,26 @@ class SkySensorMixin(BaseSensorMixin):
         return self._uv
 
     @property
-    def wind_average(self) -> Quantity:
+    def wind_average(self) -> Quantity[float]:
         """Return the wind average in meters per second (m/s)."""
         return self._wind_average * UNIT_METERS_PER_SECOND
 
     @property
-    def wind_direction(self) -> Quantity:
+    def wind_direction(self) -> Quantity[int]:
         """Return the wind direction in degrees."""
         return self._wind_direction * UNIT_DEGREES
 
     @property
-    def wind_gust(self) -> Quantity:
+    def wind_gust(self) -> Quantity[float]:
         """Return the wind gust in meters per second (m/s)."""
         return self._wind_gust * UNIT_METERS_PER_SECOND
 
     @property
-    def wind_lull(self) -> Quantity:
+    def wind_lull(self) -> Quantity[float]:
         """Return the wind lull in meters per second (m/s)."""
         return self._wind_lull * UNIT_METERS_PER_SECOND
 
     @property
-    def wind_sample_interval(self) -> Quantity:
+    def wind_sample_interval(self) -> Quantity[int]:
         """Return wind sample interval in seconds."""
         return self._wind_sample_interval * UNIT_MINUTES

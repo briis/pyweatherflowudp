@@ -43,13 +43,26 @@ async def test_process_message(
     listener: WeatherFlowListener,
     remote_endpoint: RemoteEndpoint,
     device_status: dict[str, Any],
+    hub_status: dict[str, Any],
 ) -> None:
     """Test processing a received message."""
     await listener.start_listening()
     await asyncio.sleep(0.1)
+
     remote_endpoint.send(bytes(json.dumps(device_status), "UTF-8"))
     await asyncio.sleep(0.1)
+    assert len(listener.devices) == 1
+    assert len(listener.hubs) == 0
+    assert len(listener.sensors) == 1
+
+    remote_endpoint.send(bytes(json.dumps(hub_status), "UTF-8"))
+    await asyncio.sleep(0.1)
+    assert len(listener.devices) == 2
+    assert len(listener.hubs) == 1
+    assert len(listener.sensors) == 1
+
     await listener.stop_listening()
+    assert not listener.is_listening
 
 
 async def test_listener_connection_errors(listener: WeatherFlowListener) -> None:

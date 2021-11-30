@@ -37,11 +37,11 @@ class Event:
 class LightningStrikeEvent(Event):
     """Lightning strike event class."""
 
-    _distance: int
+    _distance: float
     _energy: int
 
     @property
-    def distance(self) -> Quantity:
+    def distance(self) -> Quantity[float]:
         """Return the distance in kilometers."""
         return self._distance * UNIT_KILOMETERS
 
@@ -77,12 +77,12 @@ class WindEvent(Event):
     _direction: int
 
     @property
-    def direction(self) -> Quantity:
+    def direction(self) -> Quantity[int]:
         """Return the direction in degrees."""
         return self._direction * UNIT_DEGREES
 
     @property
-    def speed(self) -> Quantity:
+    def speed(self) -> Quantity[float]:
         """Return the speed in meters per second."""
         return self._speed * UNIT_METERS_PER_SECOND
 
