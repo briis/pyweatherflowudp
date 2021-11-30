@@ -2,7 +2,7 @@
 
 An event-based asynchronous library to read UDP packets from Weatherflow weather systems on a local network without any reliance on the cloud.
 
-The atomic data provided by WeatherFlow sensors is all natively metric. To help facilitate transformations to other units or to perform calculations and comparisons, this module utilizes [Pint](https://pint.readthedocs.io/en/stable/)'s Quantity class as the type of most properties which have a unit of measurement. See the [Properties](#Properties) section below for more details.
+The atomic data provided by WeatherFlow sensors is all natively metric. To help facilitate transformations to other units or to perform calculations and comparisons, this module utilizes [Pint](https://pint.readthedocs.io/en/stable/)'s Quantity class as the type of most properties which have a unit of measurement. See the [Quantity](#Quantity) section below for more details.
 
 This module utilizes [MetPy](https://unidata.github.io/MetPy/latest/index.html) to help with additional weather calculations that are derived from the various data points provided by the actual WeatherFlow sensors. While WeatherFlow has these additional data points available via the app and rest API, they are unavailable via the low-level UDP packet data. And while a list of [derived metrics](https://weatherflow.github.io/Tempest/api/derived-metric-formulas.html) and the associated equations has been posted, they can be quite complex to implement. As such, MetPy is an invaluable resource since the work has already been done and it eliminates the need to write all the equations in this module (and potentially get them wrong). You may notice that some of these values aren't an exact match with what is shown in the WeatherFlow app because there are different formulas (some simpler, some more complex) to calculate derived weather metrics. This is because WeatherFlow and MetPy may have chosen one of the sometimes many different formulas to get the result desired. They should still be relatively close, however.
 
@@ -50,7 +50,85 @@ The classes and events in this section can be imported from `pyweatherflowudp.cl
 
 The classes and events in this section can be imported from `pyweatherflowudp.device`.
 
-### Properties
+## Properties
+
+### WeatherFlowListener
+
+| property     | type | description                                                                              |
+| ------------ | ---- | ---------------------------------------------------------------------------------------- |
+| devices      | list | The known devices.                                                                       |
+| hubs         | list | The known hubs.                                                                          |
+| is_listening | bool | `True` if the listener is currently monitoring UDP packets on the network, else `False`. |
+| sensors      | list | The known sensors.                                                                       |
+
+### WeatherFlowDevice
+
+Base for hubs and sensors.
+
+| property          | type     | description                                                        |
+| ----------------- | -------- | ------------------------------------------------------------------ |
+| firmware_revision | str      | The current firmware revision of the device.                       |
+| load_complete     | bool     | `True` if the device has parsed all initial updates, else `False`. |
+| model             | str      | The model of the device ("Hub", "Air", "Sky", "Tempest").          |
+| rssi              | Quantity | The signal strength of the device in decibels.                     |
+| serial_number     | str      | The serial number of the device.                                   |
+| timestamp         | datetime | The UTC timestamp from the last status update.                     |
+| uptime            | int      | The number of seconds the device has been up and running.          |
+
+### HubDevice
+
+| property    | type | description                         |
+| ----------- | ---- | ----------------------------------- |
+| reset_flags | list | The current reset flags of the hub. |
+
+### WeatherFlowSensorDevice
+
+Base for sensors.
+
+| property        | type     | description                                           |
+| --------------- | -------- | ----------------------------------------------------- |
+| battery         | Quantity | The current battery voltage.                          |
+| hub_rssi        | Quantity | The signal strength of the hub in decibels.           |
+| hub_sn          | str      | The serial number of the hub the sensor belongs to.   |
+| last_report     | datetime | The UTC timestamp from the last observation.          |
+| sensor_status   | list     | The list of issues the sensor is currently reporting. |
+| report_interval | Quantity | The report interval in minutes.                       |
+| reset_flags     | list     | The current reset flags of the hub.                   |
+
+### AirSensorType
+
+Base for "air" sensor measurements (Air/Tempest).
+
+| property                          | type                 | description                                               |
+| --------------------------------- | -------------------- | --------------------------------------------------------- |
+| air_temperature                   | Quantity             | The current air temperature in degrees Celsius.           |
+| last_lightning_strike_event       | LightningStrikeEvent | The last lightning strike event.                          |
+| lightning_strike_average_distance | Quantity             | The average distance for lightning strikes in kilometers. |
+| lightning_strike_count            | int                  | The number of lightning strikes.                          |
+| relative_humidity                 | Quantity             | The relative humidity percentage.                         |
+| station_pressure                  | Quantity             | The observed station pressure in millibars.               |
+| air_density                       | Quantity             | The calculated air density in kilograms per cubic meter.  |
+
+### SkySensorType
+
+Base for "sky" sensor measurements (Sky/Tempest).
+
+| property                    | type              | description                                                           |
+| --------------------------- | ----------------- | --------------------------------------------------------------------- |
+| illuminance                 | Quantity          | The current illuminance in Lux.                                       |
+| last_rain_start_event       | RainStartEvent    | The last rain start event.                                            |
+| last_wind_event             | WindEvent         | The last wind event.                                                  |
+| precipitation_type          | PrecipitationType | The current precipitation type: (NONE, RAIN, HAIL or RAIN_HAIL).      |
+| rain_amount_previous_minute | Quantity          | The rain amount over the last minute in millimeters per minute.       |
+| solar_radiation             | Quantity          | The solar radiation in Watts per cubic meter.                         |
+| uv                          | int               | The current UV index.                                                 |
+| wind_average                | Quantity          | The wind speed average over the report interval in meters per second. |
+| wind_direction              | Quantity          | The wind direction over the report interval in degrees.               |
+| wind_gust                   | Quantity          | The wind gust (maximum 3 second sample) in meters per second.         |
+| wind_lull                   | Quantity          | The wind lull (minimum 3 second sample) in meters per second.         |
+| wind_sample_interval        | Quantity          | The wind sample interval in seconds.                                  |
+
+### Quantity
 
 The `pint.Quantity` class has been utilized for device properties which are associated with a unit of measurement. This allows a conversion from the native metric unit to another of the user's choice such as degrees Celsius to degrees Fahrenheit, which produces another `pint.Quantity`:
 

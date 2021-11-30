@@ -21,7 +21,7 @@ from .const import (
     UNIT_VOLTS,
 )
 from .enums import PrecipitationType
-from .event import LightningStrikeEvent
+from .event import LightningStrikeEvent, RainStartEvent, WindEvent
 from .helpers import utc_timestamp_from_epoch
 
 
@@ -128,6 +128,8 @@ class SkySensorMixin(BaseSensorMixin):
     """Sky sensor mixin."""
 
     _illuminance: int = 0
+    _last_rain_start_event: RainStartEvent | None = None
+    _last_wind_event: WindEvent | None = None
     _precipitation_type: int = 0
     _rain_amount_previous_minute: float = 0
     _solar_radiation: int = 0
@@ -142,6 +144,16 @@ class SkySensorMixin(BaseSensorMixin):
     def illuminance(self) -> Quantity:
         """Return the illuminance is lux (lx)."""
         return self._illuminance * UNIT_LUX
+
+    @property
+    def last_rain_start_event(self) -> RainStartEvent | None:
+        """Return the last rain start event."""
+        return self._last_rain_start_event
+
+    @property
+    def last_wind_event(self) -> WindEvent | None:
+        """Return the last wind event."""
+        return self._last_wind_event
 
     @property
     def precipitation_type(self) -> PrecipitationType:

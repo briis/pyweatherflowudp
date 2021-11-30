@@ -349,25 +349,12 @@ class SkySensorType(SkySensorMixin, WeatherFlowSensorDevice):
         """Initialize a WeatherFlow device."""
         super().__init__(serial_number=serial_number, data=data)
 
-        self._last_rain_start_event: RainStartEvent | None = None
-        self._last_wind_event: WindEvent | None = None
-
         self.register_parse_handlers(
             {
                 EVENT_RAIN_START: (self.parse_rain_start_event, DATA_EVENT),
                 EVENT_RAPID_WIND: (self.parse_wind_event, DATA_OBSERVATION),
             }
         )
-
-    @property
-    def last_rain_start_event(self) -> RainStartEvent | None:
-        """Return the last rain start event."""
-        return self._last_rain_start_event
-
-    @property
-    def last_wind_event(self) -> WindEvent | None:
-        """Return the last wind event."""
-        return self._last_wind_event
 
     def parse_rain_start_event(self, data: list) -> None:
         """Parse rain start event data."""
@@ -472,6 +459,6 @@ class TempestDevice(AirSensorType, SkySensorType):
 SERIAL_MAP = {"HB": HubDevice, "AR": AirDevice, "SK": SkyDevice, "ST": TempestDevice}
 
 
-def detmine_device(serial_number: str) -> type[WeatherFlowDevice]:
+def determine_device(serial_number: str) -> type[WeatherFlowDevice]:
     """Return the type of WeatherFlow device from a serial number."""
     return SERIAL_MAP.get(serial_number[:2], WeatherFlowDevice)

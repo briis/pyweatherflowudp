@@ -8,7 +8,12 @@ from typing import Any
 
 from .aioudp import LocalEndpoint, open_local_endpoint
 from .const import DEFAULT_HOST, DEFAULT_PORT
-from .device import WeatherFlowDevice, detmine_device
+from .device import (
+    HubDevice,
+    WeatherFlowDevice,
+    WeatherFlowSensorDevice,
+    determine_device,
+)
 from .errors import AddressInUseError, EndpointError
 from .mixins import EventMixin
 
@@ -36,9 +41,30 @@ class WeatherFlowListener(EventMixin):
         self._udp_connection: LocalEndpoint | None = None
 
     @property
+    def devices(self) -> list[WeatherFlowDevice]:
+        """Return the known devices."""
+        return list(self._devices.values())
+
+    @property
+    def hubs(self) -> list[HubDevice]:
+        """Return the known hubs."""
+        return [
+            device for device in self._devices.values() if isinstance(device, HubDevice)
+        ]
+
+    @property
     def is_listening(self) -> bool:
         """Return `True` if the client is listening for messages."""
         return self._udp_task is not None
+
+    @property
+    def sensors(self) -> list[WeatherFlowSensorDevice]:
+        """Return the known sensors."""
+        return [
+            device
+            for device in self._devices.values()
+            if isinstance(device, WeatherFlowSensorDevice)
+        ]
 
     async def start_listening(self) -> None:
         """Connect the UDP socket and start listening for messages."""
@@ -91,7 +117,7 @@ class WeatherFlowListener(EventMixin):
             return
 
         if serial_number not in self._devices:
-            self._devices[serial_number] = detmine_device(serial_number)(
+            self._devices[serial_number] = determine_device(serial_number)(
                 serial_number=serial_number, data=json_data
             )
             self.emit(EVENT_DEVICE_DISCOVERED, self._devices[serial_number])
