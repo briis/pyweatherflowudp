@@ -51,7 +51,9 @@ async def main():
                     # or at 1000 feet
                     print(
                         "Sea level pressure:",
-                        device.calculate_sea_level_pressure(units.Quantity(1000, "ft")),
+                        device.calculate_sea_level_pressure(
+                            units.Quantity(1000, units.foot)
+                        ),
                     )
                 if isinstance(device, TempestDevice):
                     # print the feels like temperature in °F

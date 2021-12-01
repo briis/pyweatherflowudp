@@ -99,15 +99,25 @@ Base for sensors.
 
 Base for "air" sensor measurements (Air/Tempest).
 
-| property                          | type                 | description                                               |
-| --------------------------------- | -------------------- | --------------------------------------------------------- |
-| air_temperature                   | Quantity             | The current air temperature in degrees Celsius.           |
-| last_lightning_strike_event       | LightningStrikeEvent | The last lightning strike event.                          |
-| lightning_strike_average_distance | Quantity             | The average distance for lightning strikes in kilometers. |
-| lightning_strike_count            | int                  | The number of lightning strikes.                          |
-| relative_humidity                 | Quantity             | The relative humidity percentage.                         |
-| station_pressure                  | Quantity             | The observed station pressure in millibars.               |
-| air_density                       | Quantity             | The calculated air density in kilograms per cubic meter.  |
+| property                                   | type                 | description                                                            |
+| ------------------------------------------ | -------------------- | ---------------------------------------------------------------------- |
+| air_temperature                            | Quantity             | The current air temperature in degrees Celsius.                        |
+| last_lightning_strike_event                | LightningStrikeEvent | The last lightning strike event.                                       |
+| lightning_strike_average_distance          | Quantity             | The average distance for lightning strikes in kilometers.              |
+| lightning_strike_count                     | int                  | The number of lightning strikes.                                       |
+| relative_humidity                          | Quantity             | The relative humidity percentage.                                      |
+| station_pressure                           | Quantity             | The observed station pressure in millibars.                            |
+| air_density\*                              | Quantity             | The calculated air density in kilograms per cubic meter.               |
+| delta_t\*                                  | Quantity             | The calculated Delta T in delta degrees Celsius.                       |
+| dew_point_temperature\*                    | Quantity             | The calculated dew point temperature in degrees Celsius.               |
+| heat_index\*                               | Quantity             | The calculated heat index in degrees Celsius.                          |
+| vapor_pressure\*                           | Quantity             | The calculated vapor pressure in millibars.                            |
+| wet_bulb_temperature\*                     | Quantity             | The calculated wet bulb temperature in degrees Celsius.                |
+| _calculate_sea_level_pressure(height)_\*\* | Quantity             | Calculate the sea level pressure in millibars from a specified height. |
+
+\* Indicates derived properties
+
+\*\* Indicates this is a method, not a property.
 
 ### SkySensorType
 
@@ -127,6 +137,15 @@ Base for "sky" sensor measurements (Sky/Tempest).
 | wind_gust                   | Quantity          | The wind gust (maximum 3 second sample) in meters per second.         |
 | wind_lull                   | Quantity          | The wind lull (minimum 3 second sample) in meters per second.         |
 | wind_sample_interval        | Quantity          | The wind sample interval in seconds.                                  |
+
+### TempestDevice
+
+| property                 | type     | description                                                 |
+| ------------------------ | -------- | ----------------------------------------------------------- |
+| feels_like_temperature\* | Quantity | The calculated "feels like" temperature in degrees Celsius. |
+| wind_chill_temperature\* | Quantity | The calculated wind chill temperature in degrees Celsius.   |
+
+\* Indicates derived properties
 
 ### Quantity
 

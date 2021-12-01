@@ -158,7 +158,7 @@ class AirSensorMixin(BaseSensorMixin):
         )
 
     def calculate_sea_level_pressure(self, height: Quantity[float]) -> Quantity[float]:
-        """Return the calculated sea level pressure in millibars (mbar)."""
+        """Calculate the sea level pressure in millibars (mbar) from a specified height."""
         return mpcalc.altimeter_to_sea_level_pressure(
             self.station_pressure, height, self.air_temperature
         )

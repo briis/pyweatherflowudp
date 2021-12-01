@@ -479,7 +479,7 @@ class TempestDevice(AirSensorType, SkySensorType):
         )
 
     @property
-    def wind_chill_temperature(self) -> Quantity[float] | None:
+    def wind_chill_temperature(self) -> Quantity[float]:
         """Return the calculated wind chill temperature in degrees Celsius (°C)."""
         return mpcalc.windchill(
             self.air_temperature, self.wind_speed, mask_undefined=False
