@@ -1,13 +1,17 @@
-"""Define package errors."""
+"""Errors for WeatherFlow UDP connections."""
 
 
 class WeatherflowUdpError(Exception):
-    """Define a base error."""
+    """Base WeatherFlow UDP error."""
 
 
-class RequestError(WeatherflowUdpError):
-    """Define an error related to invalid requests."""
+class ListenerError(WeatherflowUdpError):
+    """Error indicating a proplem with the listener."""
 
 
-class ResultError(WeatherflowUdpError):
-    """Define an error related to the result returned from a request."""
+class AddressInUseError(ListenerError):
+    """Error indicating the listener address is already in use."""
+
+
+class EndpointError(ListenerError):
+    """Error indicating an issue with the UDP endpoint."""

@@ -1,10 +1,16 @@
+"""Provide high-level UDP endpoints for asyncio.
+
+Copied/modified from https://gist.github.com/vxgmichel/e47bff34b68adb3cf6bd4845c4bed448
 """
-Asynchronous Socket Program.
-I did not write this, I got from the Internet
-But I cannot remember who the author is.
-"""
+from __future__ import annotations
+
+__all__ = ["open_local_endpoint", "open_remote_endpoint"]
+
 import asyncio
 import warnings
+from typing import Any
+
+# pylint: disable=protected-access
 
 # Datagram protocol
 
@@ -12,37 +18,38 @@ import warnings
 class DatagramEndpointProtocol(asyncio.DatagramProtocol):
     """Datagram protocol for the endpoint high-level interface."""
 
-    def __init__(self, endpoint):
+    def __init__(self, endpoint: Endpoint) -> None:
         self._endpoint = endpoint
 
     # Protocol methods
 
-    def connection_made(self, transport):
+    def connection_made(self, transport: Any) -> None:
         self._endpoint._transport = transport
 
-    def connection_lost(self, exc):
+    def connection_lost(self, exc: Any) -> None:
         assert exc is None
-        if self._endpoint._write_ready_future is not None:
+        if self._endpoint._write_ready_future is not None:  # pragma: no cover
             self._endpoint._write_ready_future.set_result(None)
         self._endpoint.close()
 
     # Datagram protocol methods
 
-    def datagram_received(self, data, addr):
+    def datagram_received(self, data: bytes, addr: tuple[str, int]) -> None:
         self._endpoint.feed_datagram(data, addr)
 
-    def error_received(self, exc):
+    def error_received(self, exc: Any) -> None:
         msg = "Endpoint received an error: {!r}"
         warnings.warn(msg.format(exc))
 
     # Workflow control
 
-    def pause_writing(self):
+    def pause_writing(self) -> None:  # pragma: no cover
         assert self._endpoint._write_ready_future is None
+        assert self._endpoint._transport._loop
         loop = self._endpoint._transport._loop
         self._endpoint._write_ready_future = loop.create_future()
 
-    def resume_writing(self):
+    def resume_writing(self) -> None:  # pragma: no cover
         assert self._endpoint._write_ready_future is not None
         self._endpoint._write_ready_future.set_result(None)
         self._endpoint._write_ready_future = None
@@ -58,23 +65,25 @@ class Endpoint:
     It is initialized with an optional queue size for the incoming datagrams.
     """
 
-    def __init__(self, queue_size=None):
+    def __init__(self, queue_size: int | None = None) -> None:
         if queue_size is None:
             queue_size = 0
-        self._queue = asyncio.Queue(queue_size)
+        self._queue: asyncio.Queue = asyncio.Queue(queue_size)
         self._closed = False
-        self._transport = None
-        self._write_ready_future = None
+        self._transport: Any = None
+        self._write_ready_future: asyncio.Future | None = None
 
     # Protocol callbacks
 
-    def feed_datagram(self, data, addr):
+    def feed_datagram(self, data: bytes | None, addr: tuple[str, int] | None) -> None:
+        """Feed a datagram."""
         try:
             self._queue.put_nowait((data, addr))
         except asyncio.QueueFull:
             warnings.warn("Endpoint queue is full")
 
-    def close(self):
+    def close(self) -> None:
+        """Close the endpoint."""
         # Manage flag
         if self._closed:
             return
@@ -88,15 +97,14 @@ class Endpoint:
 
     # User methods
 
-    def send(self, data, addr):
+    def send(self, data: bytes, addr: tuple[str, int] | None) -> None:
         """Send a datagram to the given address."""
         if self._closed:
             raise IOError("Enpoint is closed")
         self._transport.sendto(data, addr)
 
-    async def receive(self):
-        """Wait for an incoming datagram and return it with
-        the corresponding address.
+    async def receive(self) -> tuple[bytes, tuple[str, int]]:
+        """Wait for an incoming datagram and return it with the corresponding address.
 
         This method is a coroutine.
         """
@@ -107,28 +115,28 @@ class Endpoint:
             raise IOError("Enpoint is closed")
         return data, addr
 
-    def abort(self):
+    def abort(self) -> None:
         """Close the transport immediately."""
         if self._closed:
             raise IOError("Enpoint is closed")
         self._transport.abort()
         self.close()
 
-    async def drain(self):
+    async def drain(self) -> None:
         """Drain the transport buffer below the low-water mark."""
-        if self._write_ready_future is not None:
+        if self._write_ready_future is not None:  # pragma: no cover
             await self._write_ready_future
 
     # Properties
 
     @property
-    def address(self):
-        """The endpoint address as a (host, port) tuple."""
+    def address(self) -> Any:
+        """Endpoint address as a (host, port) tuple."""
         return self._transport.get_extra_info("socket").getsockname()
 
     @property
-    def closed(self):
-        """Indicates whether the endpoint is closed or not."""
+    def closed(self) -> bool:
+        """Indicate whether the endpoint is closed or not."""
         return self._closed
 
 
@@ -138,8 +146,6 @@ class LocalEndpoint(Endpoint):
     It is initialized with an optional queue size for the incoming datagrams.
     """
 
-    pass
-
 
 class RemoteEndpoint(Endpoint):
     """High-level interface for UDP remote enpoints.
@@ -147,25 +153,22 @@ class RemoteEndpoint(Endpoint):
     It is initialized with an optional queue size for the incoming datagrams.
     """
 
-    def send(self, data):
+    def send(self, data: bytes, addr: tuple[str, int] | None = None) -> None:
         """Send a datagram to the remote host."""
         super().send(data, None)
-
-    async def receive(self):
-        """Wait for an incoming datagram from the remote host.
-
-        This method is a coroutine.
-        """
-        data, addr = await super().receive()
-        return data
 
 
 # High-level coroutines
 
 
 async def open_datagram_endpoint(
-    host, port, *, endpoint_factory=Endpoint, remote=False, **kwargs
-):
+    host: str,
+    port: int,
+    *,
+    endpoint_factory: Any = Endpoint,
+    remote: bool = False,
+    **kwargs: Any
+) -> Any:
     """Open and return a datagram endpoint.
 
     The default endpoint factory is the Endpoint class.
@@ -180,7 +183,13 @@ async def open_datagram_endpoint(
     return endpoint
 
 
-async def open_local_endpoint(host="0.0.0.0", port=0, *, queue_size=None, **kwargs):
+async def open_local_endpoint(
+    host: str = "0.0.0.0",
+    port: int = 0,
+    *,
+    queue_size: int | None = None,
+    **kwargs: dict[str, Any]
+) -> Any:
     """Open and return a local datagram endpoint.
 
     An optional queue size arguement can be provided.
@@ -195,7 +204,9 @@ async def open_local_endpoint(host="0.0.0.0", port=0, *, queue_size=None, **kwar
     )
 
 
-async def open_remote_endpoint(host, port, *, queue_size=None, **kwargs):
+async def open_remote_endpoint(
+    host: str, port: int, *, queue_size: int | None = None, **kwargs: dict[str, Any]
+) -> Any:
     """Open and return a remote datagram endpoint.
 
     An optional queue size arguement can be provided.

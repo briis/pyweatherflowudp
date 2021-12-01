@@ -1,0 +1,8 @@
+{
+  "serial_number": "ST-00000001",
+  "type": "evt_precip",
+  "hub_sn": "HB-00000001",
+  "evt": [
+    1493322445
+  ]
+}
