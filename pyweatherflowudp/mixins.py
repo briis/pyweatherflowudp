@@ -141,12 +141,6 @@ class AirSensorMixin(BaseSensorMixin):
             self.air_temperature, self.relative_humidity, mask_undefined=False
         )[0].to(UNIT_DEGREES_CELSIUS)
 
-    def sea_level_pressure(self, height: Quantity[float]) -> Quantity[float]:
-        """Return the calculated sea level pressure in millibars (mbar)."""
-        return mpcalc.altimeter_to_sea_level_pressure(
-            self.station_pressure, height, self.air_temperature
-        )
-
     @property
     def vapor_pressure(self) -> Quantity[float]:
         """Return the calculated vapor pressure in millibars (mbar)."""
@@ -161,6 +155,12 @@ class AirSensorMixin(BaseSensorMixin):
         """Return the calculated wet bulb temperature in degrees Celsius (°C)."""
         return mpcalc.wet_bulb_temperature(
             self.station_pressure, self.air_temperature, self.dew_point_temperature
+        )
+
+    def calculate_sea_level_pressure(self, height: Quantity[float]) -> Quantity[float]:
+        """Return the calculated sea level pressure in millibars (mbar)."""
+        return mpcalc.altimeter_to_sea_level_pressure(
+            self.station_pressure, height, self.air_temperature
         )
 
 

@@ -177,7 +177,7 @@ def test_tempest_device(
     assert device.feels_like_temperature == 22.37 * UNIT_DEGREES_CELSIUS
     assert round(device.heat_index, 5) == 21.9749 * UNIT_DEGREES_CELSIUS
     assert (
-        round(device.sea_level_pressure(units.Quantity(1000, units.m)), 5)
+        round(device.calculate_sea_level_pressure(units.Quantity(1000, units.m)), 5)
         == 1013.56134 * UNIT_MILLIBARS
     )
     assert round(device.vapor_pressure, 5) == 1358.58273 * UNIT_MILLIBARS
