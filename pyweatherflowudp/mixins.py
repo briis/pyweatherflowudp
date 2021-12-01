@@ -47,10 +47,7 @@ class EventMixin:
     def emit(self, event_name: str, *args: Any, **kwargs: dict[str, Any]) -> None:
         """Run all callbacks for an event."""
         for listener in self._listeners.get(event_name, []):
-            try:
-                listener(*args, **kwargs)
-            except:  # noqa E722; pylint: disable=bare-except; # pragma: no cover
-                pass
+            listener(*args, **kwargs)
 
 
 class BaseSensorMixin:
@@ -118,10 +115,53 @@ class AirSensorMixin(BaseSensorMixin):
         """Return the station pressure in millibars (mbar)."""
         return self._station_pressure * UNIT_MILLIBARS
 
+    # Derived metrics
+
     @property
     def air_density(self) -> Quantity[float]:
         """Return the calculated air density in kilograms per cubic meter (kg/m³)."""
         return mpcalc.density(self.station_pressure, self.air_temperature, 0)
+
+    @property
+    def delta_t(self) -> Quantity[float]:
+        """Return the calculated delta t in delta degrees Celsius (Δ°C)."""
+        return self.air_temperature - self.wet_bulb_temperature
+
+    @property
+    def dew_point_temperature(self) -> Quantity[float]:
+        """Return the calculated dew point temperature in degrees Celsius (°C)."""
+        return mpcalc.dewpoint_from_relative_humidity(
+            self.air_temperature, self.relative_humidity
+        )
+
+    @property
+    def heat_index(self) -> Quantity[float]:
+        """Return the calculated heat index in degrees Celsius (°C)."""
+        return mpcalc.heat_index(
+            self.air_temperature, self.relative_humidity, mask_undefined=False
+        )[0].to(UNIT_DEGREES_CELSIUS)
+
+    def sea_level_pressure(self, height: Quantity[float]) -> Quantity[float]:
+        """Return the calculated sea level pressure in millibars (mbar)."""
+        return mpcalc.altimeter_to_sea_level_pressure(
+            self.station_pressure, height, self.air_temperature
+        )
+
+    @property
+    def vapor_pressure(self) -> Quantity[float]:
+        """Return the calculated vapor pressure in millibars (mbar)."""
+        return (
+            self.relative_humidity
+            * mpcalc.saturation_vapor_pressure(self.air_temperature)
+            / self.relative_humidity.u
+        )
+
+    @property
+    def wet_bulb_temperature(self) -> Quantity[float]:
+        """Return the calculated wet bulb temperature in degrees Celsius (°C)."""
+        return mpcalc.wet_bulb_temperature(
+            self.station_pressure, self.air_temperature, self.dew_point_temperature
+        )
 
 
 class SkySensorMixin(BaseSensorMixin):
@@ -201,3 +241,13 @@ class SkySensorMixin(BaseSensorMixin):
     def wind_sample_interval(self) -> Quantity[int]:
         """Return wind sample interval in seconds."""
         return self._wind_sample_interval * UNIT_MINUTES
+
+    @property
+    def wind_speed(self) -> Quantity[float]:
+        """Return the most recent wind speed in meters per second (m/s)."""
+        return (
+            self.wind_average
+            if self._last_wind_event is None
+            or (self._last_report or 0) > self._last_wind_event.epoch
+            else self._last_wind_event.speed
+        )

@@ -21,6 +21,7 @@ from pyweatherflowudp.const import (
     UNIT_PERCENT,
     UNIT_SECONDS,
     UNIT_VOLTS,
+    units,
 )
 from pyweatherflowudp.device import (
     DATA_OBSERVATIONS,
@@ -171,6 +172,17 @@ def test_tempest_device(
     assert device.wind_lull == 0.18 * UNIT_METERS_PER_SECOND
     assert device.wind_sample_interval == 6 * UNIT_MINUTES
     assert round(device.air_density, 5) == 1.19956 * UNIT_KILOGRAMS_PER_CUBIC_METER
+    assert round(device.delta_t, 5) == 6.72368 * units.delta_degC
+    assert round(device.dew_point_temperature, 5) == 11.52858 * UNIT_DEGREES_CELSIUS
+    assert device.feels_like_temperature == 22.37 * UNIT_DEGREES_CELSIUS
+    assert round(device.heat_index, 5) == 21.9749 * UNIT_DEGREES_CELSIUS
+    assert (
+        round(device.sea_level_pressure(units.Quantity(1000, units.m)), 5)
+        == 1013.56134 * UNIT_MILLIBARS
+    )
+    assert round(device.vapor_pressure, 5) == 1358.58273 * UNIT_MILLIBARS
+    assert round(device.wet_bulb_temperature, 5) == 15.64632 * UNIT_DEGREES_CELSIUS
+    assert round(device.wind_chill_temperature, 5) == 24.61423 * UNIT_DEGREES_CELSIUS
 
     unsubscribe()
 

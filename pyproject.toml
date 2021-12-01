@@ -10,7 +10,7 @@ repository = "https://github.com/briis/pyweatherflowudp"
 keywords = ["WeatherFlow", "UDP", "asynchronous", "local"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 MetPy = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
