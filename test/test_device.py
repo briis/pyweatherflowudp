@@ -113,6 +113,7 @@ def test_tempest_device(
     evt_strike: dict[str, Any],
     rapid_wind: dict[str, Any],
     obs_st: dict[str, Any],
+    obs_st_cold: dict[str, Any],
 ) -> None:
     """Test handling of a tempest device."""
     device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=device_status)
@@ -171,20 +172,44 @@ def test_tempest_device(
     assert device.wind_gust == 0.27 * UNIT_METERS_PER_SECOND
     assert device.wind_lull == 0.18 * UNIT_METERS_PER_SECOND
     assert device.wind_sample_interval == 6 * UNIT_MINUTES
-    assert round(device.air_density, 5) == 1.19956 * UNIT_KILOGRAMS_PER_CUBIC_METER
-    assert round(device.delta_t, 5) == 6.72368 * units.delta_degC
-    assert round(device.dew_point_temperature, 5) == 11.52858 * UNIT_DEGREES_CELSIUS
+    assert round(device.air_density, 5) == 1.19959 * UNIT_KILOGRAMS_PER_CUBIC_METER
+    assert round(device.delta_t, 5) == 6.59114 * units.delta_degC
+    assert round(device.dew_point_temperature, 5) == 11.52825 * UNIT_DEGREES_CELSIUS
     assert device.feels_like_temperature == 22.37 * UNIT_DEGREES_CELSIUS
-    assert round(device.heat_index, 5) == 21.9749 * UNIT_DEGREES_CELSIUS
+    assert device.heat_index is None
     assert (
         round(device.calculate_sea_level_pressure(units.Quantity(1000, units.m)), 5)
-        == 1013.56134 * UNIT_MILLIBARS
+        == 1140.84234 * UNIT_MILLIBARS
     )
-    assert round(device.vapor_pressure, 5) == 1358.58273 * UNIT_MILLIBARS
-    assert round(device.wet_bulb_temperature, 5) == 15.64632 * UNIT_DEGREES_CELSIUS
-    assert round(device.wind_chill_temperature, 5) == 24.61423 * UNIT_DEGREES_CELSIUS
+    assert round(device.vapor_pressure, 5) == 1359.55045 * UNIT_MILLIBARS
+    assert round(device.wet_bulb_temperature, 5) == 15.77886 * UNIT_DEGREES_CELSIUS
+    assert device.wind_chill_temperature is None
 
     unsubscribe()
+
+
+def test_tempest_device_cold_weather(
+    obs_st_cold: dict[str, Any],
+) -> None:
+    """Test handling of a tempest device with cold weather."""
+    device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=obs_st_cold)
+    device.parse_message(obs_st_cold)
+    assert device.air_temperature == 0.37 * UNIT_DEGREES_CELSIUS
+    assert device.heat_index is None
+    assert round(device.wind_chill_temperature, 5) == -1.33298 * UNIT_DEGREES_CELSIUS
+    assert round(device.feels_like_temperature, 5) == -1.33298 * UNIT_DEGREES_CELSIUS
+
+
+def test_tempest_device_hot_weather(
+    obs_st_hot: dict[str, Any],
+) -> None:
+    """Test handling of a tempest device with hot weather."""
+    device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=obs_st_hot)
+    device.parse_message(obs_st_hot)
+    assert device.air_temperature == 30.37 * UNIT_DEGREES_CELSIUS
+    assert round(device.heat_index, 5) == 31.65311 * UNIT_DEGREES_CELSIUS
+    assert device.wind_chill_temperature is None
+    assert round(device.feels_like_temperature, 5) == 31.65311 * UNIT_DEGREES_CELSIUS
 
 
 def test_alternate_parse_message_paths(caplog: LogCaptureFixture):

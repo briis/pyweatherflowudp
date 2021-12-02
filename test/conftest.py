@@ -50,16 +50,28 @@ def obs_sky_fixture() -> dict[str, Any]:
     return json.loads(load_fixture("obs_sky.json"))
 
 
-@pytest.fixture(name="rapid_wind")
-def rapid_wind_fixture() -> dict[str, Any]:
-    """Load the rapid_wind fixture data."""
-    return json.loads(load_fixture("rapid_wind.json"))
-
-
 @pytest.fixture(name="obs_st")
 def obs_st_fixture() -> dict[str, Any]:
     """Load the obs_st fixture data."""
     return json.loads(load_fixture("obs_st.json"))
+
+
+@pytest.fixture(name="obs_st_cold")
+def obs_st_cold_fixture() -> dict[str, Any]:
+    """Load the obs_st_cold fixture data."""
+    return json.loads(load_fixture("obs_st_cold.json"))
+
+
+@pytest.fixture(name="obs_st_hot")
+def obs_st_hot_fixture() -> dict[str, Any]:
+    """Load the obs_st_hot fixture data."""
+    return json.loads(load_fixture("obs_st_hot.json"))
+
+
+@pytest.fixture(name="rapid_wind")
+def rapid_wind_fixture() -> dict[str, Any]:
+    """Load the rapid_wind fixture data."""
+    return json.loads(load_fixture("rapid_wind.json"))
 
 
 @pytest.fixture(name="local_address")
