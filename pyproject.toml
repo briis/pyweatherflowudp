@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyweatherflowudp"
-version = "1.0.0"
+version = "1.0.1"
 description = "An event-based asynchronous library to read UDP packets from Weatherflow weather systems on a local network without any reliance on the cloud."
 license = "MIT"
 authors = ["Nathan Spencer <natekspencer@gmail.com>"]
