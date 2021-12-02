@@ -11,7 +11,8 @@ keywords = ["WeatherFlow", "UDP", "asynchronous", "local"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-MetPy = "^1.1.0"
+Pint = "^0.18"
+PsychroLib = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.11b1"

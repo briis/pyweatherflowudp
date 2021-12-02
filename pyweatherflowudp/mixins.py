@@ -4,9 +4,16 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Callable
 
-import metpy.calc as mpcalc
 from pint import Quantity
 
+from .calc import (
+    air_density,
+    dew_point_temperature,
+    heat_index,
+    sea_level_pressure,
+    vapor_pressure,
+    wet_bulb_temperature,
+)
 from .const import (
     UNIT_DEGREES,
     UNIT_DEGREES_CELSIUS,
@@ -120,7 +127,7 @@ class AirSensorMixin(BaseSensorMixin):
     @property
     def air_density(self) -> Quantity[float]:
         """Return the calculated air density in kilograms per cubic meter (kg/m³)."""
-        return mpcalc.density(self.station_pressure, self.air_temperature, 0)
+        return air_density(self.air_temperature, self.station_pressure)
 
     @property
     def delta_t(self) -> Quantity[float]:
@@ -130,38 +137,28 @@ class AirSensorMixin(BaseSensorMixin):
     @property
     def dew_point_temperature(self) -> Quantity[float]:
         """Return the calculated dew point temperature in degrees Celsius (°C)."""
-        return mpcalc.dewpoint_from_relative_humidity(
-            self.air_temperature, self.relative_humidity
-        )
+        return dew_point_temperature(self.air_temperature, self.relative_humidity)
 
     @property
     def heat_index(self) -> Quantity[float]:
         """Return the calculated heat index in degrees Celsius (°C)."""
-        return mpcalc.heat_index(
-            self.air_temperature, self.relative_humidity, mask_undefined=False
-        )[0].to(UNIT_DEGREES_CELSIUS)
+        return heat_index(self.air_temperature, self.relative_humidity)
 
     @property
     def vapor_pressure(self) -> Quantity[float]:
         """Return the calculated vapor pressure in millibars (mbar)."""
-        return (
-            self.relative_humidity
-            * mpcalc.saturation_vapor_pressure(self.air_temperature)
-            / self.relative_humidity.u
-        )
+        return vapor_pressure(self.air_temperature, self.relative_humidity)
 
     @property
     def wet_bulb_temperature(self) -> Quantity[float]:
         """Return the calculated wet bulb temperature in degrees Celsius (°C)."""
-        return mpcalc.wet_bulb_temperature(
-            self.station_pressure, self.air_temperature, self.dew_point_temperature
+        return wet_bulb_temperature(
+            self.air_temperature, self.relative_humidity, self.station_pressure
         )
 
     def calculate_sea_level_pressure(self, height: Quantity[float]) -> Quantity[float]:
         """Calculate the sea level pressure in millibars (mbar) from a specified height."""
-        return mpcalc.altimeter_to_sea_level_pressure(
-            self.station_pressure, height, self.air_temperature
-        )
+        return sea_level_pressure(self.station_pressure, height, self.air_temperature)
 
 
 class SkySensorMixin(BaseSensorMixin):

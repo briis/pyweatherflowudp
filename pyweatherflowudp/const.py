@@ -1,6 +1,23 @@
 """WeatherFlow constants."""
-from metpy.units import units
+import functools
+import re
 
+import pint
+
+units = pint.UnitRegistry(
+    autoconvert_offset_to_baseunit=True,
+    preprocessors=[
+        functools.partial(
+            re.sub,
+            r"(?<=[A-Za-z])(?![A-Za-z])(?<![0-9\-][eE])(?<![0-9\-])(?=[0-9\-])",
+            "**",
+        ),
+        lambda string: string.replace("%", "percent"),
+    ],
+)
+units.define(
+    pint.unit.UnitDefinition("percent", "%", (), pint.converters.ScaleConverter(0.01))
+)
 units.default_format = "P~"
 
 DEFAULT_HOST = "0.0.0.0"

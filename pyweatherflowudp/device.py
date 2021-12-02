@@ -5,9 +5,9 @@ import logging
 from datetime import datetime
 from typing import Any, Callable, final
 
-import metpy.calc as mpcalc
 from pint import Quantity
 
+from .calc import wind_chill
 from .const import (
     EVENT_OBSERVATION_AIR,
     EVENT_OBSERVATION_SKY,
@@ -470,20 +470,17 @@ class TempestDevice(AirSensorType, SkySensorType):
 
     @property
     def feels_like_temperature(self) -> Quantity[float]:
-        """Return the calculated feels like temperature in degrees Celsius (°C)."""
-        return mpcalc.apparent_temperature(
-            self.air_temperature,
-            self.relative_humidity,
-            self.wind_speed,
-            mask_undefined=False,
-        )
+        """Return the feels like temperature in degrees Celsius (°C)."""
+        if self.heat_index is not None:
+            return self.heat_index
+        if self.wind_chill_temperature is not None:
+            return self.wind_chill_temperature
+        return self.air_temperature
 
     @property
     def wind_chill_temperature(self) -> Quantity[float]:
         """Return the calculated wind chill temperature in degrees Celsius (°C)."""
-        return mpcalc.windchill(
-            self.air_temperature, self.wind_speed, mask_undefined=False
-        )
+        return wind_chill(self.air_temperature, self.wind_speed)
 
 
 SERIAL_MAP = {"HB": HubDevice, "AR": AirDevice, "SK": SkyDevice, "ST": TempestDevice}
