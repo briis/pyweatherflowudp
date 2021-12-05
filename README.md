@@ -67,15 +67,16 @@ The classes and events in this section can be imported from `pyweatherflowudp.de
 
 Base for hubs and sensors.
 
-| property          | type     | description                                                        |
-| ----------------- | -------- | ------------------------------------------------------------------ |
-| firmware_revision | str      | The current firmware revision of the device.                       |
-| load_complete     | bool     | `True` if the device has parsed all initial updates, else `False`. |
-| model             | str      | The model of the device ("Hub", "Air", "Sky", "Tempest").          |
-| rssi              | Quantity | The signal strength of the device in decibels.                     |
-| serial_number     | str      | The serial number of the device.                                   |
-| timestamp         | datetime | The UTC timestamp from the last status update.                     |
-| uptime            | int      | The number of seconds the device has been up and running.          |
+| property          | type     | description                                                         |
+| ----------------- | -------- | ------------------------------------------------------------------- |
+| firmware_revision | str      | The current firmware revision of the device.                        |
+| load_complete     | bool     | `True` if the device has parsed all initial updates, else `False`.  |
+| model             | str      | The model of the device ("Hub", "Air", "Sky", "Tempest").           |
+| rssi              | Quantity | The signal strength of the device in decibels.                      |
+| serial_number     | str      | The serial number of the device.                                    |
+| timestamp         | datetime | The UTC timestamp from the last status update.                      |
+| up_since          | datetime | The UTC timestamp the device started up and has since been running. |
+| uptime            | int      | The number of seconds the device has been up and running.           |
 
 ### HubDevice
 
@@ -139,6 +140,7 @@ Base for "sky" sensor measurements (Sky/Tempest).
 | wind_gust                   | Quantity          | The wind gust (maximum 3 second sample) in meters per second.         |
 | wind_lull                   | Quantity          | The wind lull (minimum 3 second sample) in meters per second.         |
 | wind_sample_interval        | Quantity          | The wind sample interval in seconds.                                  |
+| wind_speed                  | Quantity          | The wind speed in meters per second.                                  |
 
 ### TempestDevice
 
