@@ -126,22 +126,23 @@ Base for "air" sensor measurements (Air/Tempest).
 
 Base for "sky" sensor measurements (Sky/Tempest).
 
-| property                    | type              | description                                                           |
-| --------------------------- | ----------------- | --------------------------------------------------------------------- |
-| illuminance                 | Quantity          | The current illuminance in Lux.                                       |
-| last_rain_start_event       | RainStartEvent    | The last rain start event.                                            |
-| last_wind_event             | WindEvent         | The last wind event.                                                  |
-| precipitation_type          | PrecipitationType | The current precipitation type: (NONE, RAIN, HAIL or RAIN_HAIL).      |
-| rain_amount_previous_minute | Quantity          | The rain amount over the last minute in millimeters per minute.       |
-| solar_radiation             | Quantity          | The solar radiation in Watts per cubic meter.                         |
-| uv                          | int               | The current UV index.                                                 |
-| wind_average                | Quantity          | The wind speed average over the report interval in meters per second. |
-| wind_direction              | Quantity          | The wind direction over the report interval in degrees.               |
-| wind_direction_cardinal     | string            | The wind direction cardinal (16-wind compass rose).                   |
-| wind_gust                   | Quantity          | The wind gust (maximum 3 second sample) in meters per second.         |
-| wind_lull                   | Quantity          | The wind lull (minimum 3 second sample) in meters per second.         |
-| wind_sample_interval        | Quantity          | The wind sample interval in seconds.                                  |
-| wind_speed                  | Quantity          | The wind speed in meters per second.                                  |
+| property                          | type              | description                                                           |
+| --------------------------------- | ----------------- | --------------------------------------------------------------------- |
+| illuminance                       | Quantity          | The current illuminance in Lux.                                       |
+| last_rain_start_event             | RainStartEvent    | The last rain start event.                                            |
+| last_wind_event                   | WindEvent         | The last wind event.                                                  |
+| precipitation_type                | PrecipitationType | The current precipitation type: (NONE, RAIN, HAIL or RAIN_HAIL).      |
+| rain_accumulation_previous_minute | Quantity          | The rain accumulation from the last minute in millimeters.            |
+| rain_rate                         | Quantity          | The rain rate in millimeters per hour (based on the last minute).     |
+| solar_radiation                   | Quantity          | The solar radiation in Watts per cubic meter.                         |
+| uv                                | int               | The current UV index.                                                 |
+| wind_average                      | Quantity          | The wind speed average over the report interval in meters per second. |
+| wind_direction                    | Quantity          | The wind direction over the report interval in degrees.               |
+| wind_direction_cardinal           | string            | The wind direction cardinal (16-wind compass rose).                   |
+| wind_gust                         | Quantity          | The wind gust (maximum 3 second sample) in meters per second.         |
+| wind_lull                         | Quantity          | The wind lull (minimum 3 second sample) in meters per second.         |
+| wind_sample_interval              | Quantity          | The wind sample interval in seconds.                                  |
+| wind_speed                        | Quantity          | The wind speed in meters per second.                                  |
 
 ### TempestDevice
 

@@ -1,6 +1,7 @@
 """Mixins for WeatherFlow client and sensors."""
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from typing import Any, Callable
 
@@ -22,6 +23,8 @@ from .const import (
     UNIT_LUX,
     UNIT_METERS_PER_SECOND,
     UNIT_MILLIBARS,
+    UNIT_MILLIMETERS,
+    UNIT_MILLIMETERS_PER_HOUR,
     UNIT_MILLIMETERS_PER_MINUTE,
     UNIT_MINUTES,
     UNIT_PERCENT,
@@ -30,6 +33,8 @@ from .const import (
 from .enums import PrecipitationType
 from .event import LightningStrikeEvent, RainStartEvent, WindEvent
 from .helpers import degrees_to_cardinal, utc_timestamp_from_epoch
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class EventMixin:
@@ -101,9 +106,7 @@ class AirSensorMixin(BaseSensorMixin):
         return self._last_lightning_strike_event
 
     @property
-    def lightning_strike_average_distance(
-        self,
-    ) -> Quantity[float]:
+    def lightning_strike_average_distance(self) -> Quantity[float]:
         """Return the lightning strike average distance in kilometers (km)."""
         return self._lightning_strike_average_distance * UNIT_KILOMETERS
 
@@ -168,7 +171,7 @@ class SkySensorMixin(BaseSensorMixin):
     _last_rain_start_event: RainStartEvent | None = None
     _last_wind_event: WindEvent | None = None
     _precipitation_type: int = 0
-    _rain_amount_previous_minute: float = 0
+    _rain_accumulation_previous_minute: float = 0
     _solar_radiation: int = 0
     _uv: float = 0
     _wind_average: float = 0
@@ -198,11 +201,28 @@ class SkySensorMixin(BaseSensorMixin):
         return PrecipitationType(self._precipitation_type)
 
     @property
-    def rain_amount_previous_minute(
-        self,
-    ) -> Quantity[float]:
-        """Return the rain amount over previous minute in millimeters (mm/min)."""
-        return self._rain_amount_previous_minute * UNIT_MILLIMETERS_PER_MINUTE
+    def rain_accumulation_previous_minute(self) -> Quantity[float]:
+        """Return the rain accumulation from the previous minute in millimeters."""
+        return self._rain_accumulation_previous_minute * UNIT_MILLIMETERS
+
+    @property
+    def rain_amount_previous_minute(self) -> Quantity[float]:
+        """(DEPRECATED) Return the rain amount over previous minute in millimeters (mm/min)."""
+        _LOGGER.warning(
+            "The property 'rain_amount_previous_minute' has been deprecated due to "
+            "inconsistent naming with the property and the units. Please use either "
+            "`rain_accumulation_previous_minute` for a rain accumulation amount or "
+            "`rain_rate` for an hourly intensity of rain."
+        )
+        return self._rain_accumulation_previous_minute * UNIT_MILLIMETERS_PER_MINUTE
+
+    @property
+    def rain_rate(self) -> Quantity[float]:
+        """Return the rain rate in millimeters per hour (mm/hr).
+
+        Based on the rain accumulation from the previous minute.
+        """
+        return self._rain_accumulation_previous_minute * 60 * UNIT_MILLIMETERS_PER_HOUR
 
     @property
     def solar_radiation(self) -> Quantity[int]:
