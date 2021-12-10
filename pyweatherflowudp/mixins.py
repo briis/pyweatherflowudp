@@ -207,7 +207,11 @@ class SkySensorMixin(BaseSensorMixin):
 
     @property
     def rain_amount_previous_minute(self) -> Quantity[float]:
-        """(DEPRECATED) Return the rain amount over previous minute in millimeters (mm/min)."""
+        """**Return the rain amount over previous minute in millimeters (mm/min).
+
+        **This property has been deprecated. Please use `rain_accumulation_previous_minute`
+        for an accumulation amount or `rain_rate` for an hourly intensity.
+        """
         _LOGGER.warning(
             "The property 'rain_amount_previous_minute' has been deprecated due to "
             "inconsistent naming with the property and the units. Please use either "
