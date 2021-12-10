@@ -27,10 +27,8 @@ from .mixins import AirSensorMixin, BaseSensorMixin, EventMixin, SkySensorMixin
 DATA_DEBUG = "debug"
 DATA_EVENT = "evt"
 DATA_FIRMWARE_REVISION = "firmware_revision"
-DATA_FS = "fs"
 DATA_HUB_RSSI = "hub_rssi"
 DATA_HUB_SN = "hub_sn"
-DATA_MQTT_STATS = "mqtt_stats"
 DATA_OBSERVATION = "ob"
 DATA_OBSERVATIONS = "obs"
 DATA_RADIO_STATS = "radio_stats"
@@ -143,10 +141,12 @@ class WeatherFlowDevice(EventMixin):
     @final
     def parse_message(self, data: dict[str, Any]) -> None:
         """Parse a device message."""
-        if handler := self._parse_message_map.get(message_type := data[DATA_TYPE]):
+        if handler := self._parse_message_map.get(
+            message_type := data.get(DATA_TYPE, "")
+        ):
             if isinstance(handler, tuple):
                 handler, field = handler
-                data = data[field]
+                data = data.get(field, {})
             handler(data)
         else:
             _LOGGER.warning("Unhandled %s message: %s", message_type, data)
@@ -163,9 +163,7 @@ class HubDevice(WeatherFlowDevice):
 
         self._reset_flags: str = ""
         self._seq: int = 0
-        self._fs: list[int] = []
         self._radio_stats: list[int] = []
-        self._mqtt_stats: list[int] = []
 
         self.register_parse_handlers({EVENT_STATUS_HUB: self.parse_hub_status})
 
@@ -184,15 +182,13 @@ class HubDevice(WeatherFlowDevice):
 
     def parse_hub_status(self, data: dict[str, Any]) -> None:
         """Parse hub status."""
-        self._firmware_revision = data[DATA_FIRMWARE_REVISION]
-        self._uptime = data[DATA_UPTIME]
-        self._rssi = data[DATA_RSSI]
-        self._timestamp = data[DATA_TIMESTAMP]
-        self._reset_flags = data[DATA_RESET_FLAGS]
-        self._seq = data[DATA_SEQ]
-        self._fs = data[DATA_FS]
-        self._radio_stats = data[DATA_RADIO_STATS]
-        self._mqtt_stats = data[DATA_MQTT_STATS]
+        self._firmware_revision = data.get(DATA_FIRMWARE_REVISION)
+        self._uptime = data.get(DATA_UPTIME, 0)
+        self._rssi = data.get(DATA_RSSI, 0)
+        self._timestamp = data.get(DATA_TIMESTAMP)
+        self._reset_flags = data.get(DATA_RESET_FLAGS, "")
+        self._seq = data.get(DATA_SEQ, 0)
+        self._radio_stats = data.get(DATA_RADIO_STATS, [])
 
         assert self._timestamp
 
@@ -282,14 +278,14 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
 
     def parse_device_status(self, data: dict[str, Any]) -> None:
         """Parse the device status."""
-        self._timestamp = data[DATA_TIMESTAMP]
-        self._uptime = data[DATA_UPTIME]
-        self._voltage = data[DATA_VOLTAGE]
-        self._firmware_revision = data[DATA_FIRMWARE_REVISION]
-        self._rssi = data[DATA_RSSI]
-        self._hub_rssi = data[DATA_HUB_RSSI]
-        self._sensor_status = data[DATA_SENSOR_STATUS]
-        self._debug = truebool(data[DATA_DEBUG])
+        self._timestamp = data.get(DATA_TIMESTAMP)
+        self._uptime = data.get(DATA_UPTIME, 0)
+        self._voltage = data.get(DATA_VOLTAGE, 0)
+        self._firmware_revision = data.get(DATA_FIRMWARE_REVISION)
+        self._rssi = data.get(DATA_RSSI, 0)
+        self._hub_rssi = data.get(DATA_HUB_RSSI, 0)
+        self._sensor_status = data.get(DATA_SENSOR_STATUS, 0)
+        self._debug = truebool(data.get(DATA_DEBUG))
 
         if not self._initial_status:
             self._initial_status = True

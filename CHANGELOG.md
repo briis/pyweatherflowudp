@@ -1,3 +1,7 @@
+# 1.1.1 (2021-12-10)
+
+- Better handling of missing data points when parsing messages which may occure when the firmware revision changes
+
 # 1.1.0 (2021-12-10)
 
 - Deprecated rain_amount_previous_minute due to name/units inconsistency
