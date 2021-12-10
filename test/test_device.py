@@ -16,6 +16,8 @@ from pyweatherflowudp.const import (
     UNIT_LUX,
     UNIT_METERS_PER_SECOND,
     UNIT_MILLIBARS,
+    UNIT_MILLIMETERS,
+    UNIT_MILLIMETERS_PER_HOUR,
     UNIT_MILLIMETERS_PER_MINUTE,
     UNIT_MINUTES,
     UNIT_PERCENT,
@@ -96,7 +98,8 @@ def test_sky_device(obs_sky: dict[str, Any]) -> None:
     assert device.battery == 3.12 * UNIT_VOLTS
     assert device.illuminance == 9000 * UNIT_LUX
     assert device.precipitation_type == PrecipitationType.NONE
-    assert device.rain_amount_previous_minute == 0 * UNIT_MILLIMETERS_PER_MINUTE
+    assert device.rain_accumulation_previous_minute == 0 * UNIT_MILLIMETERS
+    assert device.rain_rate == 0 * UNIT_MILLIMETERS_PER_HOUR
     assert device.report_interval == 1 * UNIT_MINUTES
     assert device.solar_radiation == 130 * UNIT_IRRADIATION
     assert device.uv == 10
@@ -114,7 +117,6 @@ def test_tempest_device(
     evt_strike: dict[str, Any],
     rapid_wind: dict[str, Any],
     obs_st: dict[str, Any],
-    obs_st_cold: dict[str, Any],
 ) -> None:
     """Test handling of a tempest device."""
     device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=device_status)
@@ -162,7 +164,8 @@ def test_tempest_device(
     assert device.lightning_strike_average_distance == 0 * UNIT_KILOMETERS
     assert device.lightning_strike_count == 0
     assert device.precipitation_type == PrecipitationType.NONE
-    assert device.rain_amount_previous_minute == 0 * UNIT_MILLIMETERS_PER_MINUTE
+    assert device.rain_accumulation_previous_minute == 0.01 * UNIT_MILLIMETERS
+    assert device.rain_rate == 0.6 * UNIT_MILLIMETERS_PER_HOUR
     assert device.relative_humidity == 50.26 * UNIT_PERCENT
     assert device.report_interval == 1 * UNIT_MINUTES
     assert device.solar_radiation == 3 * UNIT_IRRADIATION
@@ -190,9 +193,7 @@ def test_tempest_device(
     unsubscribe()
 
 
-def test_tempest_device_cold_weather(
-    obs_st_cold: dict[str, Any],
-) -> None:
+def test_tempest_device_cold_weather(obs_st_cold: dict[str, Any]) -> None:
     """Test handling of a tempest device with cold weather."""
     device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=obs_st_cold)
     device.parse_message(obs_st_cold)
@@ -202,9 +203,7 @@ def test_tempest_device_cold_weather(
     assert round(device.feels_like_temperature, 5) == -1.33298 * UNIT_DEGREES_CELSIUS
 
 
-def test_tempest_device_hot_weather(
-    obs_st_hot: dict[str, Any],
-) -> None:
+def test_tempest_device_hot_weather(obs_st_hot: dict[str, Any]) -> None:
     """Test handling of a tempest device with hot weather."""
     device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=obs_st_hot)
     device.parse_message(obs_st_hot)
@@ -214,7 +213,24 @@ def test_tempest_device_hot_weather(
     assert round(device.feels_like_temperature, 5) == 31.65311 * UNIT_DEGREES_CELSIUS
 
 
-def test_alternate_parse_message_paths(caplog: LogCaptureFixture):
+def test_alternate_parse_message_paths(caplog: LogCaptureFixture) -> None:
+    """Test alternate parse message paths."""
     device = HubDevice(serial_number=HUB_SERIAL_NUMBER)
     device.parse_message({"type": "no_handler"})
     assert "Unhandled no_handler message" in caplog.text
+
+
+def test_deprecated_properties(
+    obs_st: dict[str, Any], caplog: LogCaptureFixture
+) -> None:
+    """Test a warning is loggeed for deprecated properties."""
+    device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=obs_st)
+    assert device.model == "Tempest"
+    assert device.serial_number == TEMPEST_SERIAL_NUMBER
+    assert device.hub_sn == HUB_SERIAL_NUMBER
+
+    device.parse_message(obs_st)
+    assert device.rain_amount_previous_minute == 0.01 * UNIT_MILLIMETERS_PER_MINUTE
+    assert (
+        "The property 'rain_amount_previous_minute' has been deprecated" in caplog.text
+    )
