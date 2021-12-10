@@ -102,6 +102,7 @@ def test_sky_device(obs_sky: dict[str, Any]) -> None:
     assert device.uv == 10
     assert device.wind_average == 4.6 * UNIT_METERS_PER_SECOND
     assert device.wind_direction == 187 * UNIT_DEGREES
+    assert device.wind_direction_cardinal == "S"
     assert device.wind_gust == 7.4 * UNIT_METERS_PER_SECOND
     assert device.wind_lull == 2.6 * UNIT_METERS_PER_SECOND
     assert device.wind_sample_interval == 3 * UNIT_MINUTES
@@ -169,6 +170,7 @@ def test_tempest_device(
     assert device.uv == 0.03
     assert device.wind_average == 0.22 * UNIT_METERS_PER_SECOND
     assert device.wind_direction == 144 * UNIT_DEGREES
+    assert device.wind_direction_cardinal == "SE"
     assert device.wind_gust == 0.27 * UNIT_METERS_PER_SECOND
     assert device.wind_lull == 0.18 * UNIT_METERS_PER_SECOND
     assert device.wind_sample_interval == 6 * UNIT_MINUTES

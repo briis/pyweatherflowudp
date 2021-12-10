@@ -29,7 +29,7 @@ from .const import (
 )
 from .enums import PrecipitationType
 from .event import LightningStrikeEvent, RainStartEvent, WindEvent
-from .helpers import utc_timestamp_from_epoch
+from .helpers import degrees_to_cardinal, utc_timestamp_from_epoch
 
 
 class EventMixin:
@@ -223,6 +223,11 @@ class SkySensorMixin(BaseSensorMixin):
     def wind_direction(self) -> Quantity[int]:
         """Return the wind direction in degrees."""
         return self._wind_direction * UNIT_DEGREES
+
+    @property
+    def wind_direction_cardinal(self) -> str:
+        """Return the wind direction cardinality."""
+        return degrees_to_cardinal(self._wind_direction)
 
     @property
     def wind_gust(self) -> Quantity[float]:

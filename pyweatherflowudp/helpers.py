@@ -4,7 +4,38 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
+from pint import Quantity
+
+DIRECTIONS = [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSW",
+    "SW",
+    "WSW",
+    "W",
+    "WNW",
+    "NW",
+    "NNW",
+]
 UTC = timezone.utc
+
+
+def degrees_to_cardinal(degree: float | Quantity[float]) -> str:
+    """Convert degrees to a cardinal direction."""
+    return DIRECTIONS[
+        round(
+            (degree.m if isinstance(degree, Quantity) else degree)
+            / (360.0 / (directions_count := len(DIRECTIONS)))
+        )
+        % directions_count
+    ]
 
 
 def truebool(val: Any | None) -> bool:

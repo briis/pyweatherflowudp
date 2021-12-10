@@ -137,6 +137,7 @@ Base for "sky" sensor measurements (Sky/Tempest).
 | uv                          | int               | The current UV index.                                                 |
 | wind_average                | Quantity          | The wind speed average over the report interval in meters per second. |
 | wind_direction              | Quantity          | The wind direction over the report interval in degrees.               |
+| wind_direction_cardinal     | string            | The wind direction cardinal (16-wind compass rose).                   |
 | wind_gust                   | Quantity          | The wind gust (maximum 3 second sample) in meters per second.         |
 | wind_lull                   | Quantity          | The wind lull (minimum 3 second sample) in meters per second.         |
 | wind_sample_interval        | Quantity          | The wind sample interval in seconds.                                  |
