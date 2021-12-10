@@ -133,7 +133,7 @@ Base for "sky" sensor measurements (Sky/Tempest).
 | last_wind_event                   | WindEvent         | The last wind event.                                                               |
 | precipitation_type                | PrecipitationType | The current precipitation type: (NONE, RAIN, HAIL or RAIN_HAIL).                   |
 | rain_accumulation_previous_minute | Quantity          | The rain accumulation from the previous minute in millimeters.                     |
-| rain_rate                         | Quantity          | The rain rate in millimeters per hour (based on the previous minute accumulation). |
+| rain_rate\*                       | Quantity          | The rain rate in millimeters per hour (based on the previous minute accumulation). |
 | solar_radiation                   | Quantity          | The solar radiation in Watts per cubic meter.                                      |
 | uv                                | int               | The current UV index.                                                              |
 | wind_average                      | Quantity          | The wind speed average over the report interval in meters per second.              |
@@ -143,6 +143,8 @@ Base for "sky" sensor measurements (Sky/Tempest).
 | wind_lull                         | Quantity          | The wind lull (minimum 3 second sample) in meters per second.                      |
 | wind_sample_interval              | Quantity          | The wind sample interval in seconds.                                               |
 | wind_speed                        | Quantity          | The wind speed in meters per second.                                               |
+
+\* Indicates derived properties
 
 ### TempestDevice
 
