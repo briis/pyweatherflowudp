@@ -1,3 +1,10 @@
+# 1.1.0 (2021-12-10)
+
+- Deprecated rain_amount_previous_minute due to name/units inconsistency
+- Added rain_accumulation_previous_minute, measured in millimeters (mm)
+- Added rain_rate, measured in millimeters per hour (mm/hr)
+- Added wind_direction_cardinal to indicate the wind direction based on a 16-wind compass rose.
+
 # 1.0.1 (2021-12-02)
 
 Replaces the MetPy package with a combination of PsychroLib and coded equations.
