@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, TypeVar
 
 from pint import Quantity
 
@@ -24,6 +24,7 @@ DIRECTIONS = [
     "NW",
     "NNW",
 ]
+T = TypeVar("T")  # pylint: disable=invalid-name
 UTC = timezone.utc
 
 
@@ -36,6 +37,11 @@ def degrees_to_cardinal(degree: float | Quantity[float]) -> str:
         )
         % directions_count
     ]
+
+
+def nvl(value: T | None, default: T) -> T:
+    """Return default if value is None, else value."""
+    return default if value is None else value
 
 
 def truebool(val: Any | None) -> bool:

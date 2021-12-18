@@ -1,0 +1,13 @@
+{
+  "serial_number": "ST-00000001",
+  "type": "device_status",
+  "hub_sn": "HB-00000001",
+  "timestamp": 1639766824,
+  "uptime": 15524363,
+  "voltage": 2.358,
+  "firmware_revision": 156,
+  "rssi": -48,
+  "hub_rssi": -45,
+  "sensor_status": 8196,
+  "debug": 0
+}

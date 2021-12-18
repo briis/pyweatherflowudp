@@ -28,11 +28,12 @@ from .const import (
     UNIT_MILLIMETERS_PER_MINUTE,
     UNIT_MINUTES,
     UNIT_PERCENT,
+    UNIT_SECONDS,
     UNIT_VOLTS,
 )
 from .enums import PrecipitationType
 from .event import LightningStrikeEvent, RainStartEvent, WindEvent
-from .helpers import degrees_to_cardinal, utc_timestamp_from_epoch
+from .helpers import degrees_to_cardinal, nvl, utc_timestamp_from_epoch
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -174,10 +175,10 @@ class SkySensorMixin(BaseSensorMixin):
     _rain_accumulation_previous_minute: float = 0
     _solar_radiation: int = 0
     _uv: float = 0
-    _wind_average: float = 0
-    _wind_direction: int = 0
-    _wind_gust: float = 0
-    _wind_lull: float = 0
+    _wind_average: float | None = None
+    _wind_direction: int | None = None
+    _wind_gust: float | None = None
+    _wind_lull: float | None = None
     _wind_sample_interval: int = 0
 
     @property
@@ -241,12 +242,12 @@ class SkySensorMixin(BaseSensorMixin):
     @property
     def wind_average(self) -> Quantity[float]:
         """Return the wind average in meters per second (m/s)."""
-        return self._wind_average * UNIT_METERS_PER_SECOND
+        return nvl(self._wind_average, 0) * UNIT_METERS_PER_SECOND
 
     @property
     def wind_direction(self) -> Quantity[int]:
         """Return the wind direction in degrees."""
-        return self._wind_direction * UNIT_DEGREES
+        return nvl(self._wind_direction, 0) * UNIT_DEGREES
 
     @property
     def wind_direction_cardinal(self) -> str:
@@ -256,17 +257,17 @@ class SkySensorMixin(BaseSensorMixin):
     @property
     def wind_gust(self) -> Quantity[float]:
         """Return the wind gust in meters per second (m/s)."""
-        return self._wind_gust * UNIT_METERS_PER_SECOND
+        return nvl(self._wind_gust, 0) * UNIT_METERS_PER_SECOND
 
     @property
     def wind_lull(self) -> Quantity[float]:
         """Return the wind lull in meters per second (m/s)."""
-        return self._wind_lull * UNIT_METERS_PER_SECOND
+        return nvl(self._wind_lull, 0) * UNIT_METERS_PER_SECOND
 
     @property
     def wind_sample_interval(self) -> Quantity[int]:
         """Return wind sample interval in seconds."""
-        return self._wind_sample_interval * UNIT_MINUTES
+        return self._wind_sample_interval * UNIT_SECONDS
 
     @property
     def wind_speed(self) -> Quantity[float]:
@@ -274,6 +275,6 @@ class SkySensorMixin(BaseSensorMixin):
         return (
             self.wind_average
             if self._last_wind_event is None
-            or (self._last_report or 0) > self._last_wind_event.epoch
+            or nvl(self._last_report, 0) > self._last_wind_event.epoch
             else self._last_wind_event.speed
         )
