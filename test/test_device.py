@@ -108,7 +108,7 @@ def test_sky_device(obs_sky: dict[str, Any]) -> None:
     assert device.wind_direction_cardinal == "S"
     assert device.wind_gust == 7.4 * UNIT_METERS_PER_SECOND
     assert device.wind_lull == 2.6 * UNIT_METERS_PER_SECOND
-    assert device.wind_sample_interval == 3 * UNIT_MINUTES
+    assert device.wind_sample_interval == 3 * UNIT_SECONDS
 
 
 def test_tempest_device(
@@ -178,7 +178,7 @@ def test_tempest_device(
     assert device.wind_direction_cardinal == "SE"
     assert device.wind_gust == 0.27 * UNIT_METERS_PER_SECOND
     assert device.wind_lull == 0.18 * UNIT_METERS_PER_SECOND
-    assert device.wind_sample_interval == 6 * UNIT_MINUTES
+    assert device.wind_sample_interval == 6 * UNIT_SECONDS
     assert round(device.air_density, 5) == 1.19959 * UNIT_KILOGRAMS_PER_CUBIC_METER
     assert round(device.delta_t, 5) == 6.59114 * units.delta_degC
     assert round(device.dew_point_temperature, 5) == 11.52825 * UNIT_DEGREES_CELSIUS
@@ -213,6 +213,26 @@ def test_tempest_device_hot_weather(obs_st_hot: dict[str, Any]) -> None:
     assert round(device.heat_index, 5) == 31.65311 * UNIT_DEGREES_CELSIUS
     assert device.wind_chill_temperature is None
     assert round(device.feels_like_temperature, 5) == 31.65311 * UNIT_DEGREES_CELSIUS
+
+
+def test_tempest_device_low_voltage(
+    device_status_low_voltage: dict[str, Any], obs_st_low_voltage: dict[str, Any]
+) -> None:
+    """Test handling of a tempest device with low voltage."""
+    device = TempestDevice(
+        serial_number=TEMPEST_SERIAL_NUMBER, data=device_status_low_voltage
+    )
+    device.parse_message(device_status_low_voltage)
+    assert device.sensor_status == ["Lightning Disturber"]
+
+    device.parse_message(obs_st_low_voltage)
+    assert device.last_report == datetime.fromtimestamp(1639766824, timezone.utc)
+    assert device.wind_lull == 0 * UNIT_METERS_PER_SECOND
+    assert device.wind_average == 0 * UNIT_METERS_PER_SECOND
+    assert device.wind_gust == 0 * UNIT_METERS_PER_SECOND
+    assert device.wind_direction == 0 * UNIT_DEGREES
+    assert device.wind_sample_interval == 300 * UNIT_SECONDS
+    assert device.battery == 2.358 * UNIT_VOLTS
 
 
 def test_alternate_parse_message_paths(caplog: LogCaptureFixture) -> None:

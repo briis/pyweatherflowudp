@@ -20,6 +20,12 @@ def device_status_fixture() -> dict[str, Any]:
     return json.loads(load_fixture("device_status.json"))
 
 
+@pytest.fixture(name="device_status_low_voltage")
+def device_status_low_voltage_fixture() -> dict[str, Any]:
+    """Load the device_status_low_voltage fixture data."""
+    return json.loads(load_fixture("device_status_low_voltage.json"))
+
+
 @pytest.fixture(name="evt_precip")
 def evt_precip_fixture() -> dict[str, Any]:
     """Load the evt_precip fixture data."""
@@ -66,6 +72,12 @@ def obs_st_cold_fixture() -> dict[str, Any]:
 def obs_st_hot_fixture() -> dict[str, Any]:
     """Load the obs_st_hot fixture data."""
     return json.loads(load_fixture("obs_st_hot.json"))
+
+
+@pytest.fixture(name="obs_st_low_voltage")
+def obs_st_low_voltage_fixture() -> dict[str, Any]:
+    """Load the obs_st_low_voltage fixture data."""
+    return json.loads(load_fixture("obs_st_low_voltage.json"))
 
 
 @pytest.fixture(name="rapid_wind")
