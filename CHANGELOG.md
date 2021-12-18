@@ -1,13 +1,18 @@
+# 1.1.2 (2021-12-18)
+
+- Handle null wind values on observations, which happens during low voltage mode
+- Fix units associated with wind_sample_interval (was erroneously in minutes, now correctly in seconds)
+
 # 1.1.1 (2021-12-10)
 
-- Better handling of missing data points when parsing messages which may occure when the firmware revision changes
+- Better handling of missing data points when parsing messages which may occur when the firmware revision changes
 
 # 1.1.0 (2021-12-10)
 
 - Deprecated rain_amount_previous_minute due to name/units inconsistency
 - Added rain_accumulation_previous_minute, measured in millimeters (mm)
 - Added rain_rate, measured in millimeters per hour (mm/hr)
-- Added wind_direction_cardinal to indicate the wind direction based on a 16-wind compass rose.
+- Added wind_direction_cardinal to indicate the wind direction based on a 16-wind compass rose
 
 # 1.0.1 (2021-12-02)
 
