@@ -465,7 +465,7 @@ class TempestDevice(AirSensorType, SkySensorType):
     # Derived metrics
 
     @property
-    def feels_like_temperature(self) -> Quantity[float]:
+    def feels_like_temperature(self) -> Quantity[float] | None:
         """Return the feels like temperature in degrees Celsius (°C)."""
         if self.heat_index is not None:
             return self.heat_index
@@ -474,8 +474,10 @@ class TempestDevice(AirSensorType, SkySensorType):
         return self.air_temperature
 
     @property
-    def wind_chill_temperature(self) -> Quantity[float]:
+    def wind_chill_temperature(self) -> Quantity[float] | None:
         """Return the calculated wind chill temperature in degrees Celsius (°C)."""
+        if None in (self.air_temperature, self.wind_speed):
+            return None
         return wind_chill(self.air_temperature, self.wind_speed)
 
 
