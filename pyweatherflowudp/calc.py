@@ -7,6 +7,7 @@ from pint import Quantity
 from .const import (
     UNIT_DEGREES_CELSIUS,
     UNIT_KILOGRAMS_PER_CUBIC_METER,
+    UNIT_METERS,
     UNIT_MILLIBARS,
     UNIT_PERCENT,
     units,
@@ -27,6 +28,29 @@ def air_density(
     )
 
 
+def cloud_base(
+    air_temperature: Quantity[float],
+    relative_humidity: Quantity[float],
+    altitude: Quantity[float],
+) -> Quantity[float]:
+    """Calculate the estimated altitude above mean sea level (amsl) to the cloud base.
+
+    Reference:
+        https://holfuy.com/en/support/cloud-base-calculations
+    """
+    return (
+        (
+            (
+                air_temperature.to("degC").m
+                - dew_point_temperature(air_temperature, relative_humidity).to("degC").m
+            )
+            * 126
+            + altitude.to("m").m
+        )
+        * UNIT_METERS
+    ).to(altitude.u)
+
+
 def dew_point_temperature(
     air_temperature: Quantity[float], relative_humidity: Quantity[float]
 ) -> Quantity[float]:
@@ -43,6 +67,20 @@ def dew_point_temperature(
         )
         * UNIT_DEGREES_CELSIUS
     ).to(air_temperature.u)
+
+
+def freezing_level(
+    air_temperature: Quantity[float], altitude: Quantity[float]
+) -> Quantity[float]:
+    """Calculate the estimated altitude above mean sea level (amsl) where the temperature is freezing.
+
+    References:
+        https://github.com/briis/hass-weatherflow2mqtt/issues/131
+        https://community.home-assistant.io/t/local-offline-self-hosted-weather-forecast/349135/16
+    """
+    return ((air_temperature.to("degC").m * 192 + altitude.to("m").m) * UNIT_METERS).to(
+        altitude.u
+    )
 
 
 def heat_index(

@@ -39,6 +39,7 @@ UNIT_IRRADIATION = units.W / units.m ** 2
 UNIT_KILOGRAMS_PER_CUBIC_METER = units.kg / units.m ** 3
 UNIT_KILOMETERS = units.km
 UNIT_LUX = units.lx
+UNIT_METERS = units.m
 UNIT_METERS_PER_SECOND = units.m / units.sec
 UNIT_MILLIBARS = units.mbar
 UNIT_MILLIMETERS = units.mm

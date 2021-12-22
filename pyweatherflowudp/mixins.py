@@ -9,7 +9,9 @@ from pint import Quantity
 
 from .calc import (
     air_density,
+    cloud_base,
     dew_point_temperature,
+    freezing_level,
     heat_index,
     sea_level_pressure,
     vapor_pressure,
@@ -176,13 +178,34 @@ class AirSensorMixin(BaseSensorMixin):
             self.air_temperature, self.relative_humidity, self.station_pressure
         )
 
-    def calculate_sea_level_pressure(
-        self, height: Quantity[float]
+    def calculate_cloud_base(self, altitude: Quantity[float]) -> Quantity[float] | None:
+        """Calculate the estimated altitude above mean sea level to the cloud base."""
+        if None in (self.air_temperature, self.relative_humidity):
+            return None
+        return cloud_base(self.air_temperature, self.relative_humidity, altitude)
+
+    def calculate_freezing_level(
+        self, altitude: Quantity[float]
     ) -> Quantity[float] | None:
-        """Calculate the sea level pressure in millibars (mbar) from a specified height."""
+        """Calculate the estimated altitude above mean sea level of the freezing level."""
+        if self.air_temperature is None:
+            return None
+        return freezing_level(self.air_temperature, altitude)
+
+    def calculate_sea_level_pressure(
+        self, altitude: Quantity[float] = None, **kwargs: dict[str, Any]
+    ) -> Quantity[float] | None:
+        """Calculate the sea level pressure."""
+        if altitude is None:
+            altitude = kwargs.get("height")
+            _LOGGER.warning(
+                "The parameter 'height' has been renamed to `altitude` to reduce ambiguity. Please "
+                "update your code appropriately so that it continues to function going forward."
+            )
+
         if None in (self.air_temperature, self.station_pressure):
             return None
-        return sea_level_pressure(self.station_pressure, height, self.air_temperature)
+        return sea_level_pressure(self.station_pressure, altitude, self.air_temperature)
 
 
 class SkySensorMixin(BaseSensorMixin):

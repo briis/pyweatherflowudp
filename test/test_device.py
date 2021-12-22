@@ -14,6 +14,7 @@ from pyweatherflowudp.const import (
     UNIT_KILOGRAMS_PER_CUBIC_METER,
     UNIT_KILOMETERS,
     UNIT_LUX,
+    UNIT_METERS,
     UNIT_METERS_PER_SECOND,
     UNIT_MILLIBARS,
     UNIT_MILLIMETERS,
@@ -40,6 +41,8 @@ HUB_SERIAL_NUMBER = f"HB-{SERIAL_NUMBER}"
 AIR_SERIAL_NUMBER = f"AR-{SERIAL_NUMBER}"
 SKY_SERIAL_NUMBER = f"SK-{SERIAL_NUMBER}"
 TEMPEST_SERIAL_NUMBER = f"ST-{SERIAL_NUMBER}"
+
+STATION_ALTITUDE = units.Quantity(1000, UNIT_METERS)
 
 
 def test_hub_device(hub_status: dict[str, Any]) -> None:
@@ -184,13 +187,23 @@ def test_tempest_device(
     assert round(device.dew_point_temperature, 5) == 11.52825 * UNIT_DEGREES_CELSIUS
     assert device.feels_like_temperature == 22.37 * UNIT_DEGREES_CELSIUS
     assert device.heat_index is None
-    assert (
-        round(device.calculate_sea_level_pressure(units.Quantity(1000, units.m)), 5)
-        == 1140.84234 * UNIT_MILLIBARS
-    )
     assert round(device.vapor_pressure, 5) == 1359.55045 * UNIT_MILLIBARS
     assert round(device.wet_bulb_temperature, 5) == 15.77886 * UNIT_DEGREES_CELSIUS
     assert device.wind_chill_temperature is None
+
+    # check calculated metrics requiring extra parameters
+    assert (
+        round(device.calculate_cloud_base(altitude=STATION_ALTITUDE), 5)
+        == 2366.06112 * UNIT_METERS
+    )
+    assert (
+        round(device.calculate_freezing_level(altitude=STATION_ALTITUDE), 5)
+        == 5295.04 * UNIT_METERS
+    )
+    assert (
+        round(device.calculate_sea_level_pressure(altitude=STATION_ALTITUDE), 5)
+        == 1140.84234 * UNIT_MILLIBARS
+    )
 
     unsubscribe()
 
@@ -264,10 +277,14 @@ def test_tempest_null_values(obs_st_nulls: dict[str, Any]) -> None:
     assert device.dew_point_temperature is None
     assert device.feels_like_temperature is None
     assert device.heat_index is None
-    assert device.calculate_sea_level_pressure(units.Quantity(1000, units.m)) is None
     assert device.vapor_pressure is None
     assert device.wet_bulb_temperature is None
     assert device.wind_chill_temperature is None
+
+    # check derived metrics requiring extra parameters
+    assert device.calculate_cloud_base(altitude=STATION_ALTITUDE) is None
+    assert device.calculate_freezing_level(altitude=STATION_ALTITUDE) is None
+    assert device.calculate_sea_level_pressure(altitude=STATION_ALTITUDE) is None
 
 
 def test_alternate_parse_message_paths(caplog: LogCaptureFixture) -> None:
@@ -290,4 +307,10 @@ def test_deprecated_properties(
     assert device.rain_amount_previous_minute == 0.01 * UNIT_MILLIMETERS_PER_MINUTE
     assert (
         "The property 'rain_amount_previous_minute' has been deprecated" in caplog.text
+    )
+
+    device.calculate_sea_level_pressure(height=STATION_ALTITUDE)
+    assert (
+        "The parameter 'height' has been renamed to `altitude` to reduce ambiguity."
+        in caplog.text
     )
