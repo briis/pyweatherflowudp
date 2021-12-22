@@ -7,7 +7,9 @@ persistent=no
 
 [MESSAGES CONTROL]
 # Reasons disabled:
+# line-too-long is not enforced since it is handled via black
 # too-many-* - are not enforced for the sake of readability
 disable=
+  line-too-long,
   too-many-ancestors,
   too-many-instance-attributes
