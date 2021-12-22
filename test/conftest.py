@@ -80,12 +80,6 @@ def obs_st_low_voltage_fixture() -> dict[str, Any]:
     return json.loads(load_fixture("obs_st_low_voltage.json"))
 
 
-@pytest.fixture(name="obs_st_nulls")
-def obs_st_nulls_voltage_fixture() -> dict[str, Any]:
-    """Load the obs_st_nulls fixture data."""
-    return json.loads(load_fixture("obs_st_nulls.json"))
-
-
 @pytest.fixture(name="rapid_wind")
 def rapid_wind_fixture() -> dict[str, Any]:
     """Load the rapid_wind fixture data."""
