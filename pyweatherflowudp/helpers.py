@@ -7,8 +7,6 @@ from typing import Any, TypeVar
 from pint import Quantity
 from pint.unit import Unit
 
-from .sensor_fault import SENSOR_FAULT, SensorFault
-
 DIRECTIONS = [
     "N",
     "NNE",
@@ -60,10 +58,10 @@ def utc_timestamp_from_epoch(epoch: int | None) -> datetime | None:
     return None if epoch is None else datetime.fromtimestamp(epoch, UTC)
 
 
-def value_as_unit(value: T | None, unit: Unit = None) -> T | Quantity[T] | SensorFault:
+def value_as_unit(value: T | None, unit: Unit = None) -> T | Quantity[T] | None:
     """Return value as specified unit or sensor fault if value is none."""
     if value is None:
-        return SENSOR_FAULT
+        return None
     if unit is None:
         return value
     return value * unit

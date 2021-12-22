@@ -7,8 +7,6 @@ from typing import Any, Callable, final
 
 from pint import Quantity
 
-from pyweatherflowudp.sensor_fault import SENSOR_FAULT, SensorFault
-
 from .calc import wind_chill
 from .const import (
     EVENT_OBSERVATION_AIR,
@@ -467,19 +465,19 @@ class TempestDevice(AirSensorType, SkySensorType):
     # Derived metrics
 
     @property
-    def feels_like_temperature(self) -> Quantity[float] | SensorFault:
+    def feels_like_temperature(self) -> Quantity[float] | None:
         """Return the feels like temperature in degrees Celsius (°C)."""
-        if self.heat_index not in (None, SENSOR_FAULT):
+        if self.heat_index is not None:
             return self.heat_index
-        if self.wind_chill_temperature not in (None, SENSOR_FAULT):
+        if self.wind_chill_temperature is not None:
             return self.wind_chill_temperature
         return self.air_temperature
 
     @property
-    def wind_chill_temperature(self) -> Quantity[float] | SensorFault:
+    def wind_chill_temperature(self) -> Quantity[float] | None:
         """Return the calculated wind chill temperature in degrees Celsius (°C)."""
-        if SENSOR_FAULT in (self.air_temperature, self.wind_speed):
-            return SENSOR_FAULT
+        if None in (self.air_temperature, self.wind_speed):
+            return None
         return wind_chill(self.air_temperature, self.wind_speed)
 
 

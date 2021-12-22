@@ -34,7 +34,6 @@ from pyweatherflowudp.device import (
     TempestDevice,
 )
 from pyweatherflowudp.enums import PrecipitationType
-from pyweatherflowudp.sensor_fault import SENSOR_FAULT
 
 SERIAL_NUMBER = "00000001"
 HUB_SERIAL_NUMBER = f"HB-{SERIAL_NUMBER}"
@@ -228,10 +227,10 @@ def test_tempest_device_low_voltage(
 
     device.parse_message(obs_st_low_voltage)
     assert device.last_report == datetime.fromtimestamp(1639766824, timezone.utc)
-    assert device.wind_lull is SENSOR_FAULT
-    assert device.wind_average is SENSOR_FAULT
-    assert device.wind_gust is SENSOR_FAULT
-    assert device.wind_direction is SENSOR_FAULT
+    assert device.wind_lull is None
+    assert device.wind_average is None
+    assert device.wind_gust is None
+    assert device.wind_direction is None
     assert device.wind_sample_interval == 300 * UNIT_SECONDS
     assert device.battery == 2.358 * UNIT_VOLTS
 
@@ -241,35 +240,34 @@ def test_tempest_null_values(obs_st_nulls: dict[str, Any]) -> None:
     device = TempestDevice(serial_number=TEMPEST_SERIAL_NUMBER, data=obs_st_nulls)
     device.parse_message(obs_st_nulls)
     assert device.last_report == datetime.fromtimestamp(1640083867, timezone.utc)
-    assert device.wind_lull is SENSOR_FAULT
-    assert device.wind_average is SENSOR_FAULT
-    assert device.wind_gust is SENSOR_FAULT
-    assert device.wind_direction is SENSOR_FAULT
-    assert device.wind_sample_interval is SENSOR_FAULT
-    assert device.station_pressure is SENSOR_FAULT
-    assert device.air_temperature is SENSOR_FAULT
-    assert device.relative_humidity is SENSOR_FAULT
-    assert device.illuminance is SENSOR_FAULT
-    assert device.uv is SENSOR_FAULT
-    assert device.solar_radiation is SENSOR_FAULT
-    assert device.rain_accumulation_previous_minute is SENSOR_FAULT
-    assert device.precipitation_type is SENSOR_FAULT
-    assert device.lightning_strike_average_distance is SENSOR_FAULT
-    assert device.lightning_strike_count is SENSOR_FAULT
-    assert device.battery is SENSOR_FAULT
+    assert device.wind_lull is None
+    assert device.wind_average is None
+    assert device.wind_gust is None
+    assert device.wind_direction is None
+    assert device.wind_direction_cardinal is None
+    assert device.wind_sample_interval is None
+    assert device.station_pressure is None
+    assert device.air_temperature is None
+    assert device.relative_humidity is None
+    assert device.illuminance is None
+    assert device.uv is None
+    assert device.solar_radiation is None
+    assert device.rain_accumulation_previous_minute is None
+    assert device.rain_rate is None
+    assert device.precipitation_type is None
+    assert device.lightning_strike_average_distance is None
+    assert device.lightning_strike_count is None
+    assert device.battery is None
     assert device.report_interval == 0 * UNIT_MINUTES
-    assert device.air_density is SENSOR_FAULT
-    assert device.delta_t is SENSOR_FAULT
-    assert device.dew_point_temperature is SENSOR_FAULT
-    assert device.feels_like_temperature is SENSOR_FAULT
-    assert device.heat_index is SENSOR_FAULT
-    assert (
-        device.calculate_sea_level_pressure(units.Quantity(1000, units.m))
-        is SENSOR_FAULT
-    )
-    assert device.vapor_pressure is SENSOR_FAULT
-    assert device.wet_bulb_temperature is SENSOR_FAULT
-    assert device.wind_chill_temperature is SENSOR_FAULT
+    assert device.air_density is None
+    assert device.delta_t is None
+    assert device.dew_point_temperature is None
+    assert device.feels_like_temperature is None
+    assert device.heat_index is None
+    assert device.calculate_sea_level_pressure(units.Quantity(1000, units.m)) is None
+    assert device.vapor_pressure is None
+    assert device.wet_bulb_temperature is None
+    assert device.wind_chill_temperature is None
 
 
 def test_alternate_parse_message_paths(caplog: LogCaptureFixture) -> None:
