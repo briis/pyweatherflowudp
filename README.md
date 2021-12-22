@@ -52,7 +52,7 @@ The classes and events in this section can be imported from `pyweatherflowudp.cl
 
 The classes and events in this section can be imported from `pyweatherflowudp.device`.
 
-## Properties
+## Properties and Methods
 
 ### WeatherFlowListener
 
@@ -102,25 +102,28 @@ Base for sensors.
 
 Base for "air" sensor measurements (Air/Tempest).
 
-| property                                   | type                 | description                                                            |
-| ------------------------------------------ | -------------------- | ---------------------------------------------------------------------- |
-| air_temperature                            | Quantity             | The current air temperature in degrees Celsius.                        |
-| last_lightning_strike_event                | LightningStrikeEvent | The last lightning strike event.                                       |
-| lightning_strike_average_distance          | Quantity             | The average distance for lightning strikes in kilometers.              |
-| lightning_strike_count                     | int                  | The number of lightning strikes.                                       |
-| relative_humidity                          | Quantity             | The relative humidity percentage.                                      |
-| station_pressure                           | Quantity             | The observed station pressure in millibars.                            |
-| air_density\*                              | Quantity             | The calculated air density in kilograms per cubic meter.               |
-| delta_t\*                                  | Quantity             | The calculated Delta T in delta degrees Celsius.                       |
-| dew_point_temperature\*                    | Quantity             | The calculated dew point temperature in degrees Celsius.               |
-| heat_index\*                               | Quantity             | The calculated heat index in degrees Celsius.                          |
-| vapor_pressure\*                           | Quantity             | The calculated vapor pressure in millibars.                            |
-| wet_bulb_temperature\*                     | Quantity             | The calculated wet bulb temperature in degrees Celsius.                |
-| _calculate_sea_level_pressure(height)_\*\* | Quantity             | Calculate the sea level pressure in millibars from a specified height. |
+| property                          | type                 | description                                               |
+| --------------------------------- | -------------------- | --------------------------------------------------------- |
+| air_temperature                   | Quantity             | The current air temperature in degrees Celsius.           |
+| last_lightning_strike_event       | LightningStrikeEvent | The last lightning strike event.                          |
+| lightning_strike_average_distance | Quantity             | The average distance for lightning strikes in kilometers. |
+| lightning_strike_count            | int                  | The number of lightning strikes.                          |
+| relative_humidity                 | Quantity             | The relative humidity percentage.                         |
+| station_pressure                  | Quantity             | The observed station pressure in millibars.               |
+| air_density\*                     | Quantity             | The calculated air density in kilograms per cubic meter.  |
+| delta_t\*                         | Quantity             | The calculated Delta T in delta degrees Celsius.          |
+| dew_point_temperature\*           | Quantity             | The calculated dew point temperature in degrees Celsius.  |
+| heat_index\*                      | Quantity             | The calculated heat index in degrees Celsius.             |
+| vapor_pressure\*                  | Quantity             | The calculated vapor pressure in millibars.               |
+| wet_bulb_temperature\*            | Quantity             | The calculated wet bulb temperature in degrees Celsius.   |
 
 \* Indicates derived properties
 
-\*\* Indicates this is a method, not a property.
+| method                       | input (type)        | return   | description                                                                                                             |
+| ---------------------------- | ------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| calculate_cloud_base         | altitude (Quantity) | Quantity | Calculate the estimated altitude above mean sea level (AMSL) to the cloud base.                                         |
+| calculate_freezing_level     | altitude (Quantity) | Quantity | Calculate the estimated altitude above mean sea level (AMSL) where the temperature is at the freezing point (0°C/32°F). |
+| calculate_sea_level_pressure | altitude (Quantity) | Quantity | Calculate the mean sea level pressure.                                                                                  |
 
 ### SkySensorType
 

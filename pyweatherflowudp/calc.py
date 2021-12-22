@@ -33,7 +33,7 @@ def cloud_base(
     relative_humidity: Quantity[float],
     altitude: Quantity[float],
 ) -> Quantity[float]:
-    """Calculate the estimated altitude above mean sea level (amsl) to the cloud base.
+    """Calculate the estimated altitude above mean sea level (AMSL) to the cloud base.
 
     Reference:
         https://holfuy.com/en/support/cloud-base-calculations
@@ -72,7 +72,7 @@ def dew_point_temperature(
 def freezing_level(
     air_temperature: Quantity[float], altitude: Quantity[float]
 ) -> Quantity[float]:
-    """Calculate the estimated altitude above mean sea level (amsl) where the temperature is freezing.
+    """Calculate the estimated altitude above mean sea level (AMSL) where the temperature is at the freezing point (0°C/32°F).
 
     References:
         https://github.com/briis/hass-weatherflow2mqtt/issues/131
@@ -128,7 +128,7 @@ def sea_level_pressure(
     altitude: Quantity[float],
     air_temperature: Quantity[float],
 ) -> Quantity[float]:
-    """Calculate the sea level pressure."""
+    """Calculate the mean sea level pressure."""
     return (
         psychrolib.GetSeaLevelPressure(
             station_pressure.to("Pa").m,

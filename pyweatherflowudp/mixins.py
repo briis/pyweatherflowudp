@@ -179,7 +179,7 @@ class AirSensorMixin(BaseSensorMixin):
         )
 
     def calculate_cloud_base(self, altitude: Quantity[float]) -> Quantity[float] | None:
-        """Calculate the estimated altitude above mean sea level to the cloud base."""
+        """Calculate the estimated altitude above mean sea level (AMSL) to the cloud base."""
         if None in (self.air_temperature, self.relative_humidity):
             return None
         return cloud_base(self.air_temperature, self.relative_humidity, altitude)
@@ -187,7 +187,7 @@ class AirSensorMixin(BaseSensorMixin):
     def calculate_freezing_level(
         self, altitude: Quantity[float]
     ) -> Quantity[float] | None:
-        """Calculate the estimated altitude above mean sea level of the freezing level."""
+        """Calculate the estimated altitude above mean sea level (AMSL) where the temperature is at the freezing point (0°C/32°F)."""
         if self.air_temperature is None:
             return None
         return freezing_level(self.air_temperature, altitude)
