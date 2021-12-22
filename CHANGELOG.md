@@ -1,3 +1,9 @@
+# 1.3.0 (2021-12-22)
+
+- Add cloud base and freezing level calculations
+- Rename parameter `height` to `altitude` on calculate_sea_level_pressure
+  - Works with named height parameter still, but will produce a warning and eventually be dropped
+
 # 1.2.0 (2021-12-21)
 
 ## Potential Breaking Change:
