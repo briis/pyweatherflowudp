@@ -7,7 +7,7 @@ from datetime import datetime
 from pint import Quantity
 
 from .const import UNIT_DEGREES, UNIT_KILOMETERS, UNIT_METERS_PER_SECOND
-from .helpers import utc_timestamp_from_epoch
+from .helpers import nvl, utc_timestamp_from_epoch
 
 # pylint: disable=line-too-long
 
@@ -37,13 +37,13 @@ class Event:
 class LightningStrikeEvent(Event):
     """Lightning strike event class."""
 
-    _distance: float
-    _energy: int
+    _distance: float | None
+    _energy: int | None
 
     @property
     def distance(self) -> Quantity[float]:
         """Return the distance in kilometers."""
-        return self._distance * UNIT_KILOMETERS
+        return nvl(self._distance, 0) * UNIT_KILOMETERS
 
     @property
     def energy(self) -> int:
@@ -51,7 +51,7 @@ class LightningStrikeEvent(Event):
 
         Energy is just a pure number and has no physical meaning.
         """
-        return self._energy
+        return nvl(self._energy, 0)
 
     def __repr__(self) -> str:  # pragma: no cover
         """Return repr(self)."""
@@ -73,18 +73,18 @@ class RainStartEvent(Event):
 class WindEvent(Event):
     """Wind event class."""
 
-    _speed: float
-    _direction: int
+    _speed: float | None
+    _direction: int | None
 
     @property
     def direction(self) -> Quantity[int]:
         """Return the direction in degrees."""
-        return self._direction * UNIT_DEGREES
+        return nvl(self._direction, 0) * UNIT_DEGREES
 
     @property
     def speed(self) -> Quantity[float]:
         """Return the speed in meters per second."""
-        return self._speed * UNIT_METERS_PER_SECOND
+        return nvl(self._speed, 0) * UNIT_METERS_PER_SECOND
 
     def __repr__(self) -> str:  # pragma: no cover
         """Return repr(self)."""

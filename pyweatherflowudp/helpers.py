@@ -5,6 +5,9 @@ from datetime import datetime, timezone
 from typing import Any, TypeVar
 
 from pint import Quantity
+from pint.unit import Unit
+
+from .sensor_fault import SENSOR_FAULT, SensorFault
 
 DIRECTIONS = [
     "N",
@@ -55,3 +58,12 @@ def truebool(val: Any | None) -> bool:
 def utc_timestamp_from_epoch(epoch: int | None) -> datetime | None:
     """Return the UTC timestamp from an epoch value."""
     return None if epoch is None else datetime.fromtimestamp(epoch, UTC)
+
+
+def value_as_unit(value: T | None, unit: Unit = None) -> T | Quantity[T] | SensorFault:
+    """Return value as specified unit or sensor fault if value is none."""
+    if value is None:
+        return SENSOR_FAULT
+    if unit is None:
+        return value
+    return value * unit

@@ -33,7 +33,8 @@ from .const import (
 )
 from .enums import PrecipitationType
 from .event import LightningStrikeEvent, RainStartEvent, WindEvent
-from .helpers import degrees_to_cardinal, nvl, utc_timestamp_from_epoch
+from .helpers import degrees_to_cardinal, nvl, utc_timestamp_from_epoch, value_as_unit
+from .sensor_fault import SENSOR_FAULT, SensorFault
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,14 +67,14 @@ class EventMixin:
 class BaseSensorMixin:
     """Base sensor mixin."""
 
-    _battery: float = 0
+    _battery: float | None = 0
     _last_report: int | None = None
-    _report_interval: int = 0
+    _report_interval: int | None = 0
 
     @property
-    def battery(self) -> Quantity[float]:
+    def battery(self) -> Quantity[float] | SensorFault:
         """Return the battery in volts (V)."""
-        return self._battery * UNIT_VOLTS
+        return value_as_unit(self._battery, UNIT_VOLTS)
 
     @property
     def last_report(self) -> datetime | None:
@@ -83,23 +84,23 @@ class BaseSensorMixin:
     @property
     def report_interval(self) -> Quantity[int]:
         """Return the report interval in minutes."""
-        return self._report_interval * UNIT_MINUTES
+        return nvl(self._report_interval, 0) * UNIT_MINUTES
 
 
 class AirSensorMixin(BaseSensorMixin):
     """Air sensor mixin."""
 
-    _air_temperature: float = 0
+    _air_temperature: float | None = None
     _last_lightning_strike_event: LightningStrikeEvent | None = None
-    _lightning_strike_average_distance: float = 0
-    _lightning_strike_count: int = 0
-    _relative_humidity: float = 0
-    _station_pressure: float = 0
+    _lightning_strike_average_distance: float | None = None
+    _lightning_strike_count: int | None = None
+    _relative_humidity: float | None = None
+    _station_pressure: float | None = None
 
     @property
-    def air_temperature(self) -> Quantity[float]:
+    def air_temperature(self) -> Quantity[float] | SensorFault:
         """Return the air temperature in degrees Celsius (°C)."""
-        return self._air_temperature * UNIT_DEGREES_CELSIUS
+        return value_as_unit(self._air_temperature, UNIT_DEGREES_CELSIUS)
 
     @property
     def last_lightning_strike_event(self) -> LightningStrikeEvent | None:
@@ -107,84 +108,106 @@ class AirSensorMixin(BaseSensorMixin):
         return self._last_lightning_strike_event
 
     @property
-    def lightning_strike_average_distance(self) -> Quantity[float]:
+    def lightning_strike_average_distance(self) -> Quantity[float] | SensorFault:
         """Return the lightning strike average distance in kilometers (km)."""
-        return self._lightning_strike_average_distance * UNIT_KILOMETERS
+        return value_as_unit(self._lightning_strike_average_distance, UNIT_KILOMETERS)
 
     @property
-    def lightning_strike_count(self) -> int:
+    def lightning_strike_count(self) -> int | SensorFault:
         """Return the lightning strike count."""
-        return self._lightning_strike_count
+        return value_as_unit(self._lightning_strike_count)
 
     @property
-    def relative_humidity(self) -> Quantity[float]:
+    def relative_humidity(self) -> Quantity[float] | None:
         """Return the relative humidity percentage."""
-        return self._relative_humidity * UNIT_PERCENT
+        return value_as_unit(self._relative_humidity, UNIT_PERCENT)
 
     @property
-    def station_pressure(self) -> Quantity[float]:
+    def station_pressure(self) -> Quantity[float] | SensorFault:
         """Return the station pressure in millibars (mbar)."""
-        return self._station_pressure * UNIT_MILLIBARS
+        return value_as_unit(self._station_pressure, UNIT_MILLIBARS)
 
     # Derived metrics
 
     @property
-    def air_density(self) -> Quantity[float]:
+    def air_density(self) -> Quantity[float] | SensorFault:
         """Return the calculated air density in kilograms per cubic meter (kg/m³)."""
+        if SENSOR_FAULT in (self.air_temperature, self.station_pressure):
+            return SENSOR_FAULT
         return air_density(self.air_temperature, self.station_pressure)
 
     @property
-    def delta_t(self) -> Quantity[float]:
+    def delta_t(self) -> Quantity[float] | SensorFault:
         """Return the calculated delta t in delta degrees Celsius (Δ°C)."""
+        if isinstance(self.air_temperature, SensorFault) or isinstance(
+            self.wet_bulb_temperature, SensorFault
+        ):
+            return SENSOR_FAULT
         return self.air_temperature - self.wet_bulb_temperature
 
     @property
-    def dew_point_temperature(self) -> Quantity[float]:
+    def dew_point_temperature(self) -> Quantity[float] | SensorFault:
         """Return the calculated dew point temperature in degrees Celsius (°C)."""
+        if SENSOR_FAULT in (self.air_temperature, self.relative_humidity):
+            return SENSOR_FAULT
         return dew_point_temperature(self.air_temperature, self.relative_humidity)
 
     @property
-    def heat_index(self) -> Quantity[float]:
+    def heat_index(self) -> Quantity[float] | SensorFault:
         """Return the calculated heat index in degrees Celsius (°C)."""
+        if SENSOR_FAULT in (self.air_temperature, self.relative_humidity):
+            return SENSOR_FAULT
         return heat_index(self.air_temperature, self.relative_humidity)
 
     @property
-    def vapor_pressure(self) -> Quantity[float]:
+    def vapor_pressure(self) -> Quantity[float] | SensorFault:
         """Return the calculated vapor pressure in millibars (mbar)."""
+        if SENSOR_FAULT in (self.air_temperature, self.relative_humidity):
+            return SENSOR_FAULT
         return vapor_pressure(self.air_temperature, self.relative_humidity)
 
     @property
-    def wet_bulb_temperature(self) -> Quantity[float]:
+    def wet_bulb_temperature(self) -> Quantity[float] | SensorFault:
         """Return the calculated wet bulb temperature in degrees Celsius (°C)."""
+        if SENSOR_FAULT in (
+            self.air_temperature,
+            self.relative_humidity,
+            self.station_pressure,
+        ):
+            return SENSOR_FAULT
         return wet_bulb_temperature(
             self.air_temperature, self.relative_humidity, self.station_pressure
         )
 
-    def calculate_sea_level_pressure(self, height: Quantity[float]) -> Quantity[float]:
+    def calculate_sea_level_pressure(
+        self, height: Quantity[float]
+    ) -> Quantity[float] | SensorFault:
         """Calculate the sea level pressure in millibars (mbar) from a specified height."""
+        if SENSOR_FAULT in (self.air_temperature, self.station_pressure):
+            return SENSOR_FAULT
         return sea_level_pressure(self.station_pressure, height, self.air_temperature)
 
 
 class SkySensorMixin(BaseSensorMixin):
     """Sky sensor mixin."""
 
-    _illuminance: int = 0
+    _illuminance: int | None = None
     _last_rain_start_event: RainStartEvent | None = None
     _last_wind_event: WindEvent | None = None
-    _precipitation_type: int = 0
-    _rain_accumulation_previous_minute: float = 0
-    _solar_radiation: int = 0
-    _uv: float = 0
+    _precipitation_type: int | None = None
+    _rain_accumulation_previous_minute: float | None = None
+    _solar_radiation: int | None = None
+    _uv: float | None = None
     _wind_average: float | None = None
     _wind_direction: int | None = None
     _wind_gust: float | None = None
     _wind_lull: float | None = None
-    _wind_sample_interval: int = 0
+    _wind_sample_interval: int | None = None
 
     @property
-    def illuminance(self) -> Quantity[int]:
+    def illuminance(self) -> Quantity[int] | SensorFault:
         """Return the illuminance is lux (lx)."""
-        return self._illuminance * UNIT_LUX
+        return value_as_unit(self._illuminance, UNIT_LUX)
 
     @property
     def last_rain_start_event(self) -> RainStartEvent | None:
@@ -197,17 +220,19 @@ class SkySensorMixin(BaseSensorMixin):
         return self._last_wind_event
 
     @property
-    def precipitation_type(self) -> PrecipitationType:
+    def precipitation_type(self) -> PrecipitationType | SensorFault:
         """Return the precipitation type."""
-        return PrecipitationType(self._precipitation_type)
+        if not isinstance(val := value_as_unit(self._precipitation_type), SensorFault):
+            return PrecipitationType(val)
+        return val
 
     @property
-    def rain_accumulation_previous_minute(self) -> Quantity[float]:
+    def rain_accumulation_previous_minute(self) -> Quantity[float] | SensorFault:
         """Return the rain accumulation from the previous minute in millimeters."""
-        return self._rain_accumulation_previous_minute * UNIT_MILLIMETERS
+        return value_as_unit(self._rain_accumulation_previous_minute, UNIT_MILLIMETERS)
 
     @property
-    def rain_amount_previous_minute(self) -> Quantity[float]:
+    def rain_amount_previous_minute(self) -> Quantity[float] | SensorFault:
         """**Return the rain amount over previous minute in millimeters (mm/min).
 
         **This property has been deprecated. Please use `rain_accumulation_previous_minute`
@@ -219,58 +244,64 @@ class SkySensorMixin(BaseSensorMixin):
             "`rain_accumulation_previous_minute` for a rain accumulation amount or "
             "`rain_rate` for an hourly intensity of rain."
         )
-        return self._rain_accumulation_previous_minute * UNIT_MILLIMETERS_PER_MINUTE
+        return value_as_unit(
+            self._rain_accumulation_previous_minute, UNIT_MILLIMETERS_PER_MINUTE
+        )
 
     @property
-    def rain_rate(self) -> Quantity[float]:
+    def rain_rate(self) -> Quantity[float] | SensorFault:
         """Return the rain rate in millimeters per hour (mm/hr).
 
         Based on the rain accumulation from the previous minute.
         """
+        if self._rain_accumulation_previous_minute is None:
+            return SENSOR_FAULT
         return self._rain_accumulation_previous_minute * 60 * UNIT_MILLIMETERS_PER_HOUR
 
     @property
-    def solar_radiation(self) -> Quantity[int]:
+    def solar_radiation(self) -> Quantity[int] | SensorFault:
         """Return the solar radiation in watts per square meter (W/m²)."""
-        return self._solar_radiation * UNIT_IRRADIATION
+        return value_as_unit(self._solar_radiation, UNIT_IRRADIATION)
 
     @property
-    def uv(self) -> float:  # pylint: disable=invalid-name
+    def uv(self) -> float | SensorFault:  # pylint: disable=invalid-name
         """Return the uv index."""
-        return self._uv
+        return value_as_unit(self._uv)
 
     @property
-    def wind_average(self) -> Quantity[float]:
+    def wind_average(self) -> Quantity[float] | SensorFault:
         """Return the wind average in meters per second (m/s)."""
-        return nvl(self._wind_average, 0) * UNIT_METERS_PER_SECOND
+        return value_as_unit(self._wind_average, UNIT_METERS_PER_SECOND)
 
     @property
-    def wind_direction(self) -> Quantity[int]:
+    def wind_direction(self) -> Quantity[int] | SensorFault:
         """Return the wind direction in degrees."""
-        return nvl(self._wind_direction, 0) * UNIT_DEGREES
+        return value_as_unit(self._wind_direction, UNIT_DEGREES)
 
     @property
-    def wind_direction_cardinal(self) -> str:
+    def wind_direction_cardinal(self) -> str | SensorFault:
         """Return the wind direction cardinality."""
+        if self._wind_direction is None:
+            return SENSOR_FAULT
         return degrees_to_cardinal(self._wind_direction)
 
     @property
-    def wind_gust(self) -> Quantity[float]:
+    def wind_gust(self) -> Quantity[float] | SensorFault:
         """Return the wind gust in meters per second (m/s)."""
-        return nvl(self._wind_gust, 0) * UNIT_METERS_PER_SECOND
+        return value_as_unit(self._wind_gust, UNIT_METERS_PER_SECOND)
 
     @property
-    def wind_lull(self) -> Quantity[float]:
+    def wind_lull(self) -> Quantity[float] | SensorFault:
         """Return the wind lull in meters per second (m/s)."""
-        return nvl(self._wind_lull, 0) * UNIT_METERS_PER_SECOND
+        return value_as_unit(self._wind_lull, UNIT_METERS_PER_SECOND)
 
     @property
-    def wind_sample_interval(self) -> Quantity[int]:
+    def wind_sample_interval(self) -> Quantity[int] | SensorFault:
         """Return wind sample interval in seconds."""
-        return self._wind_sample_interval * UNIT_SECONDS
+        return value_as_unit(self._wind_sample_interval, UNIT_SECONDS)
 
     @property
-    def wind_speed(self) -> Quantity[float]:
+    def wind_speed(self) -> Quantity[float] | SensorFault:
         """Return the most recent wind speed in meters per second (m/s)."""
         return (
             self.wind_average
