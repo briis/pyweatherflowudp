@@ -1,3 +1,9 @@
+# 1.2.0 (2021-12-21)
+
+## Potential Breaking Change:
+
+- Most sensor properties now return `None` if the value is unknown instead of a default.
+
 # 1.1.2 (2021-12-18)
 
 - Handle null wind values on observations, which happens during low voltage mode
