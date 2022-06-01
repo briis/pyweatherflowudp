@@ -1,4 +1,4 @@
-# unreleased
+# 1.3.1 (2022-06-01)
 
 - Handle up_since oscillation on devices
 - Rename private initialization variables in device class for clarity
