@@ -280,6 +280,7 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         """Parse the device status."""
         old_up_since = (self._timestamp or 0) - self._uptime
         self._timestamp = data.get(DATA_TIMESTAMP)
+        assert self._timestamp
         self._uptime = data.get(DATA_UPTIME, 0)
         # Tempest devices seem to have a timestamp/uptime combo that oscillates +/- a few seconds.
         # Attempt to correct this by adjusting the uptime if the difference is less than 60 seconds.
@@ -299,7 +300,6 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
             self._initial_status_complete = True
             self._send_load_complete_event()
 
-        assert self._timestamp
         self.emit(
             EVENT_STATUS_UPDATE, CustomEvent(self._timestamp, EVENT_STATUS_UPDATE)
         )

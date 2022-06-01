@@ -1,3 +1,7 @@
+[![pypi](https://img.shields.io/pypi/v/pyweatherflowudp?style=for-the-badge)](https://pypi.org/project/pyweatherflowudp)
+[![downloads](https://img.shields.io/pypi/dm/pyweatherflowudp?style=for-the-badge)](https://pypi.org/project/pyweatherflowudp)
+[![Buy Me A Coffee/Beer](https://img.shields.io/badge/Buy_Me_A_☕/🍺-F16061?style=for-the-badge&logo=ko-fi&logoColor=white&labelColor=grey)](https://ko-fi.com/natekspencer)
+
 # pyweatherflowudp
 
 An event-based asynchronous library to read UDP packets from Weatherflow weather systems on a local network without any reliance on the cloud.
