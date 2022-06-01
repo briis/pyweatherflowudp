@@ -82,7 +82,7 @@ class WeatherFlowDevice(EventMixin):
         self._rssi: int = 0
         self._timestamp: int | None = None
         self._uptime: int = 0
-        self._initial_status: bool = False
+        self._initial_status_complete: bool = False
 
         self._listeners: dict[str, list[Callable]] = {}
         self._parse_message_map: dict[str, Callable | tuple[Callable, str]] = {}
@@ -95,7 +95,7 @@ class WeatherFlowDevice(EventMixin):
     @property
     def load_complete(self) -> bool:
         """Return `True` if the device has been completely loaded."""
-        return self._initial_status
+        return self._initial_status_complete
 
     @property
     def model(self) -> str:
@@ -192,8 +192,8 @@ class HubDevice(WeatherFlowDevice):
 
         assert self._timestamp
 
-        if not self._initial_status:
-            self._initial_status = True
+        if not self._initial_status_complete:
+            self._initial_status_complete = True
             self.emit(
                 EVENT_LOAD_COMPLETE,
                 CustomEvent(self._timestamp, EVENT_LOAD_COMPLETE),
@@ -234,7 +234,7 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         self._hub_rssi: int = 0
         self._sensor_status: int = 0
         self._debug: bool = False
-        self._initial_observation: bool = False
+        self._initial_observation_complete: bool = False
 
         self.register_parse_handlers(
             {
@@ -260,7 +260,7 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
     @property
     def load_complete(self) -> bool:
         """Return `True` if the device has been completely loaded."""
-        return self._initial_status and self._initial_observation
+        return self._initial_status_complete and self._initial_observation_complete
 
     @property
     def sensor_status(self) -> list[str]:
@@ -278,8 +278,16 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
 
     def parse_device_status(self, data: dict[str, Any]) -> None:
         """Parse the device status."""
+        old_up_since = (self._timestamp or 0) - self._uptime
         self._timestamp = data.get(DATA_TIMESTAMP)
         self._uptime = data.get(DATA_UPTIME, 0)
+        # Tempest devices seem to have a timestamp/uptime combo that oscillates +/- a few seconds.
+        # Attempt to correct this by adjusting the uptime if the difference is less than 60 seconds.
+        if (
+            self._initial_status_complete
+            and 0 < abs(dif := (self._timestamp - self._uptime) - old_up_since) < 60
+        ):
+            self._uptime += dif
         self._voltage = data.get(DATA_VOLTAGE, 0)
         self._firmware_revision = data.get(DATA_FIRMWARE_REVISION)
         self._rssi = data.get(DATA_RSSI, 0)
@@ -287,8 +295,8 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
         self._sensor_status = data.get(DATA_SENSOR_STATUS, 0)
         self._debug = truebool(data.get(DATA_DEBUG))
 
-        if not self._initial_status:
-            self._initial_status = True
+        if not self._initial_status_complete:
+            self._initial_status_complete = True
             self._send_load_complete_event()
 
         assert self._timestamp
@@ -302,15 +310,15 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
             for idx, field in self.OBSERVATION_VALUES_MAP.items():
                 setattr(self, field, observation[idx])
 
-        if not self._initial_observation:
-            self._initial_observation = True
+        if not self._initial_observation_complete:
+            self._initial_observation_complete = True
             self._send_load_complete_event()
 
         assert self._last_report
         self.emit(EVENT_OBSERVATION, CustomEvent(self._last_report, EVENT_OBSERVATION))
 
     def _send_load_complete_event(self) -> None:
-        if self._initial_status and self._initial_observation:
+        if self._initial_status_complete and self._initial_observation_complete:
             assert self._last_report
             assert self._timestamp
             self.emit(

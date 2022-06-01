@@ -143,6 +143,18 @@ def test_tempest_device(
     device.parse_message(device_status)
     assert device.rssi == -21 * UNIT_DECIBELS
 
+    # check up_since field
+    original_up_since = datetime.fromtimestamp(
+        device_status["timestamp"] - device_status["uptime"], timezone.utc
+    )
+    assert device.up_since == original_up_since
+    device_status.update({"uptime": device_status["uptime"] + 59})
+    device.parse_message(device_status)
+    assert device.up_since == original_up_since
+    device_status.update({"uptime": device_status["uptime"] + 1})
+    device.parse_message(device_status)
+    assert device.up_since < original_up_since
+
     assert not device.last_rain_start_event
     device.parse_message(evt_precip)
     assert device.last_rain_start_event
