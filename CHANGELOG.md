@@ -1,3 +1,8 @@
+# unreleased
+
+- Handle up_since oscillation on devices
+- Rename private initialization variables in device class for clarity
+
 # 1.3.0 (2021-12-22)
 
 - Add cloud base and freezing level calculations
