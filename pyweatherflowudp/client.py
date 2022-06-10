@@ -112,7 +112,7 @@ class WeatherFlowListener(EventMixin):
         try:
             json_data: dict[str, Any] = json.loads(data)
             serial_number = json_data[DATA_SERIAL_NUMBER]
-        except (json.JSONDecodeError, KeyError):
+        except (json.JSONDecodeError, KeyError, UnicodeDecodeError):
             _LOGGER.warning("Received unknown message: %s", data)
             return
 
