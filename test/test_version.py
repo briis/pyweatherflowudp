@@ -4,4 +4,4 @@ from pyweatherflowudp import __version__
 
 def test_version() -> None:
     """Test version."""
-    assert __version__ == "1.3.1"
+    assert __version__ == "1.4.0"

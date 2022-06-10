@@ -1,4 +1,4 @@
-# Unreleased
+# 1.4.0 (2022-06-10)
 
 - Adjusted logic for `wind_direction` and `wind_direction_cardinal` to report based on the last wind event or observation, whichever is most recent (similar to `wind_speed`)
 - Added properties for `wind_direction_average` and `wind_direction_average_cardinal` to report only on the average wind direction
