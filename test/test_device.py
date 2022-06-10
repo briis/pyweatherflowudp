@@ -182,7 +182,7 @@ def test_tempest_device(
     assert device.rain_accumulation_previous_minute == 0.01 * UNIT_MILLIMETERS
     assert str(device.rain_accumulation_previous_minute) == "0.01 mm"
     assert device.rain_rate == 0.6 * UNIT_MILLIMETERS_PER_HOUR
-    assert str(device.rain_rate) == "0.6 mm/hr"
+    assert str(device.rain_rate) == "0.6 mm/h"
     assert device.relative_humidity == 50.26 * UNIT_PERCENT
     assert device.report_interval == 1 * UNIT_MINUTES
     assert device.solar_radiation == 3 * UNIT_IRRADIATION
