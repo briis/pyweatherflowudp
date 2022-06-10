@@ -11,7 +11,7 @@ from _pytest.logging import LogCaptureFixture
 
 from pyweatherflowudp.aioudp import RemoteEndpoint
 from pyweatherflowudp.client import WeatherFlowListener
-from pyweatherflowudp.errors import AddressInUseError
+from pyweatherflowudp.errors import AddressInUseError, EndpointError
 
 pytestmark = pytest.mark.asyncio
 
@@ -71,6 +71,12 @@ async def test_listener_connection_errors(listener: WeatherFlowListener) -> None
         "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
         side_effect=OSError(48, "Address already in use"),
     ), pytest.raises(AddressInUseError):
+        await listener.start_listening()
+
+    with patch(
+        "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
+        side_effect=OSError(48, "Some other error"),
+    ), pytest.raises(EndpointError):
         await listener.start_listening()
 
 
