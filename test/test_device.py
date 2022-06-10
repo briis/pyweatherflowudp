@@ -107,8 +107,10 @@ def test_sky_device(obs_sky: dict[str, Any]) -> None:
     assert device.solar_radiation == 130 * UNIT_IRRADIATION
     assert device.uv == 10
     assert device.wind_average == 4.6 * UNIT_METERS_PER_SECOND
-    assert device.wind_direction == 187 * UNIT_DEGREES
-    assert device.wind_direction_cardinal == "S"
+    assert device.wind_direction == device.wind_direction_average == 187 * UNIT_DEGREES
+    assert (
+        device.wind_direction_cardinal == device.wind_direction_average_cardinal == "S"
+    )
     assert device.wind_gust == 7.4 * UNIT_METERS_PER_SECOND
     assert device.wind_lull == 2.6 * UNIT_METERS_PER_SECOND
     assert device.wind_sample_interval == 3 * UNIT_SECONDS
@@ -165,12 +167,6 @@ def test_tempest_device(
     assert device.last_lightning_strike_event.distance == 27 * UNIT_KILOMETERS
     assert device.last_lightning_strike_event.energy == 3848
 
-    assert not device.last_wind_event
-    device.parse_message(rapid_wind)
-    assert device.last_wind_event
-    assert device.last_wind_event.speed == 2.3 * UNIT_METERS_PER_SECOND
-    assert device.last_wind_event.direction == 128 * UNIT_DEGREES
-
     assert device.battery == 0 * UNIT_VOLTS
     device.parse_message(obs_st)
     assert device.air_temperature == 22.37 * UNIT_DEGREES_CELSIUS
@@ -189,8 +185,10 @@ def test_tempest_device(
     assert device.station_pressure == 1017.57 * UNIT_MILLIBARS
     assert device.uv == 0.03
     assert device.wind_average == 0.22 * UNIT_METERS_PER_SECOND
-    assert device.wind_direction == 144 * UNIT_DEGREES
-    assert device.wind_direction_cardinal == "SE"
+    assert device.wind_direction == device.wind_direction_average == 144 * UNIT_DEGREES
+    assert (
+        device.wind_direction_cardinal == device.wind_direction_average_cardinal == "SE"
+    )
     assert device.wind_gust == 0.27 * UNIT_METERS_PER_SECOND
     assert device.wind_lull == 0.18 * UNIT_METERS_PER_SECOND
     assert device.wind_sample_interval == 6 * UNIT_SECONDS
@@ -202,6 +200,16 @@ def test_tempest_device(
     assert round(device.vapor_pressure, 5) == 1359.55045 * UNIT_MILLIBARS
     assert round(device.wet_bulb_temperature, 5) == 15.77886 * UNIT_DEGREES_CELSIUS
     assert device.wind_chill_temperature is None
+
+    # check wind event
+    assert not device.last_wind_event
+    device.parse_message(rapid_wind)
+    assert device.last_wind_event
+    assert device.last_wind_event.speed == 2.3 * UNIT_METERS_PER_SECOND
+    assert device.last_wind_event.direction == 128 * UNIT_DEGREES
+    assert device.wind_speed == device.last_wind_event.speed
+    assert device.wind_direction == device.last_wind_event.direction
+    assert device.wind_direction != device.wind_direction_average
 
     # check calculated metrics requiring extra parameters
     assert (
@@ -256,6 +264,7 @@ def test_tempest_device_low_voltage(
     assert device.wind_average is None
     assert device.wind_gust is None
     assert device.wind_direction is None
+    assert device.wind_direction_average is None
     assert device.wind_sample_interval == 300 * UNIT_SECONDS
     assert device.battery == 2.358 * UNIT_VOLTS
 
@@ -270,6 +279,8 @@ def test_tempest_null_values(obs_st_nulls: dict[str, Any]) -> None:
     assert device.wind_gust is None
     assert device.wind_direction is None
     assert device.wind_direction_cardinal is None
+    assert device.wind_direction_average is None
+    assert device.wind_direction_average_cardinal is None
     assert device.wind_sample_interval is None
     assert device.station_pressure is None
     assert device.air_temperature is None

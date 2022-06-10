@@ -270,7 +270,7 @@ class SkySensorMixin(BaseSensorMixin):
 
     @property
     def rain_rate(self) -> Quantity[float] | None:
-        """Return the rain rate in millimeters per hour (mm/hr).
+        """Return the rain rate in millimeters per hour (mm/h).
 
         Based on the rain accumulation from the previous minute.
         """
@@ -295,12 +295,29 @@ class SkySensorMixin(BaseSensorMixin):
 
     @property
     def wind_direction(self) -> Quantity[int] | None:
-        """Return the wind direction in degrees."""
-        return value_as_unit(self._wind_direction, UNIT_DEGREES)
+        """Return the wind direction in degrees (°)."""
+        return (
+            value_as_unit(self._wind_direction, UNIT_DEGREES)
+            if self._last_wind_event is None
+            or nvl(self._last_report, 0) > self._last_wind_event.epoch
+            else self._last_wind_event.direction
+        )
 
     @property
     def wind_direction_cardinal(self) -> str | None:
         """Return the wind direction cardinality."""
+        if self.wind_direction is None:
+            return None
+        return degrees_to_cardinal(self.wind_direction)
+
+    @property
+    def wind_direction_average(self) -> Quantity[int] | None:
+        """Return the wind direction average in degrees (°)."""
+        return value_as_unit(self._wind_direction, UNIT_DEGREES)
+
+    @property
+    def wind_direction_average_cardinal(self) -> str | None:
+        """Return the wind direction average cardinality."""
         if self._wind_direction is None:
             return None
         return degrees_to_cardinal(self._wind_direction)
