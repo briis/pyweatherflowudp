@@ -1,3 +1,11 @@
+# Unreleased
+
+- Bump Pint to ^0.19
+
+## Potential Breaking Change:
+
+- The default symbol for hour in Pint 0.19 is now "h" instead of "hr" - https://github.com/hgrecco/pint/pull/1454
+
 # 1.3.1 (2022-06-01)
 
 - Handle up_since oscillation on devices

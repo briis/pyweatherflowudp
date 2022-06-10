@@ -167,7 +167,7 @@ async def open_datagram_endpoint(
     *,
     endpoint_factory: Any = Endpoint,
     remote: bool = False,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> Any:
     """Open and return a datagram endpoint.
 
@@ -188,7 +188,7 @@ async def open_local_endpoint(
     port: int = 0,
     *,
     queue_size: int | None = None,
-    **kwargs: dict[str, Any]
+    **kwargs: dict[str, Any],
 ) -> Any:
     """Open and return a local datagram endpoint.
 
@@ -200,7 +200,7 @@ async def open_local_endpoint(
         port,
         remote=False,
         endpoint_factory=lambda: LocalEndpoint(queue_size),
-        **kwargs
+        **kwargs,
     )
 
 
@@ -217,5 +217,5 @@ async def open_remote_endpoint(
         port,
         remote=True,
         endpoint_factory=lambda: RemoteEndpoint(queue_size),
-        **kwargs
+        **kwargs,
     )
