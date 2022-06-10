@@ -1,10 +1,14 @@
 # Unreleased
 
+- Adjusted logic for `wind_direction` and `wind_direction_cardinal` to report based on the last wind event or observation, whichever is most recent (similar to `wind_speed`)
+- Added properties for `wind_direction_average` and `wind_direction_average_cardinal` to report only on the average wind direction
+- Handle UnicodeDecodeError during message processing
 - Bump Pint to ^0.19
 
-## Potential Breaking Change:
+## Breaking Changes:
 
-- The default symbol for hour in Pint 0.19 is now "h" instead of "hr" - https://github.com/hgrecco/pint/pull/1454
+- The properties `wind_direction` and `wind_direction_cardinal` now report based on the last wind event or observation, whichever is most recent. If you want the wind direction average (previous logic), please use the properties `wind_direction_average` and `wind_direction_average_cardinal`, respectively
+- The default symbol for `rain_rate` is now `mm/h` instead of `mm/hr` due to Pint 0.19 - https://github.com/hgrecco/pint/pull/1454
 
 # 1.3.1 (2022-06-01)
 
