@@ -1,3 +1,7 @@
+# Unreleased
+
+- Adjusted logic for calculate_sea_level_pressure to match WeatherFlow (https://weatherflow.github.io/Tempest/api/derived-metric-formulas.html#sea-level-pressure)
+
 # 1.4.0 (2022-06-10)
 
 - Adjusted logic for `wind_direction` and `wind_direction_cardinal` to report based on the last wind event or observation, whichever is most recent (similar to `wind_speed`)

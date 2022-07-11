@@ -195,7 +195,7 @@ class AirSensorMixin(BaseSensorMixin):
     def calculate_sea_level_pressure(
         self, altitude: Quantity[float] = None, **kwargs: dict[str, Any]
     ) -> Quantity[float] | None:
-        """Calculate the sea level pressure."""
+        """Calculate the sea level pressure in millibars (mbar)."""
         if altitude is None:
             altitude = kwargs.get("height")
             _LOGGER.warning(
@@ -203,9 +203,9 @@ class AirSensorMixin(BaseSensorMixin):
                 "update your code appropriately so that it continues to function going forward."
             )
 
-        if None in (self.air_temperature, self.station_pressure):
+        if None in (self.station_pressure, altitude):
             return None
-        return sea_level_pressure(self.station_pressure, altitude, self.air_temperature)
+        return sea_level_pressure(self.station_pressure, altitude)
 
 
 class SkySensorMixin(BaseSensorMixin):

@@ -222,7 +222,7 @@ def test_tempest_device(
     )
     assert (
         round(device.calculate_sea_level_pressure(altitude=STATION_ALTITUDE), 5)
-        == 1140.84234 * UNIT_MILLIBARS
+        == 1144.04231 * UNIT_MILLIBARS
     )
 
     unsubscribe()

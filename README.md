@@ -127,7 +127,7 @@ Base for "air" sensor measurements (Air/Tempest).
 | ---------------------------- | ------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
 | calculate_cloud_base         | altitude (Quantity) | Quantity | Calculate the estimated altitude above mean sea level (AMSL) to the cloud base.                                         |
 | calculate_freezing_level     | altitude (Quantity) | Quantity | Calculate the estimated altitude above mean sea level (AMSL) where the temperature is at the freezing point (0°C/32°F). |
-| calculate_sea_level_pressure | altitude (Quantity) | Quantity | Calculate the mean sea level pressure.                                                                                  |
+| calculate_sea_level_pressure | altitude (Quantity) | Quantity | Calculate the sea level pressure in millibars (mbar).                                                                   |
 
 ### SkySensorType
 
