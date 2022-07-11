@@ -123,20 +123,25 @@ def heat_index(
     return (heat_idx * units.degF).to(air_temperature.u)
 
 
+@units.wraps(units.millibar, (units.millibar, units.meter))
 def sea_level_pressure(
-    station_pressure: Quantity[float],
-    altitude: Quantity[float],
-    air_temperature: Quantity[float],
+    station_pressure: Quantity[float], altitude: Quantity[float]
 ) -> Quantity[float]:
-    """Calculate the mean sea level pressure."""
-    return (
-        psychrolib.GetSeaLevelPressure(
-            station_pressure.to("Pa").m,
-            altitude.to("m").m,
-            air_temperature.to("degC").m,
-        )
-        * units.Pa
-    ).to(station_pressure.u)
+    """Calculate the sea level pressure in millibars (mbar).
+
+    https://weatherflow.github.io/Tempest/api/derived-metric-formulas.html#sea-level-pressure
+    """
+    standard_sea_level_pressure = 1013.25  # mbar
+    dry_air_gas_constant = 287.05  # J/(kg*K)
+    standard_atmosphere_lapse_rate = 0.0065  # K/m
+    gravity = 9.80665  # m/s**2
+    standard_sea_level_temperature = 288.15  # K
+    return station_pressure * (
+        1
+        + (standard_sea_level_pressure / station_pressure)
+        ** (dry_air_gas_constant * standard_atmosphere_lapse_rate / gravity)
+        * (standard_atmosphere_lapse_rate * altitude / standard_sea_level_temperature)
+    ) ** (gravity / (dry_air_gas_constant * standard_atmosphere_lapse_rate))
 
 
 def vapor_pressure(
