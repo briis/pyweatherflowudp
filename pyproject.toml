@@ -16,7 +16,7 @@ PsychroLib = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3"
-flake8 = "^4.0.1"
+flake8 = "^5.0.4"
 isort = "^5.10.1"
 mypy = "^0.991"
 pydocstyle = "^6.1.1"
