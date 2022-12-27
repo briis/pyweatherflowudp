@@ -36,6 +36,6 @@ jobs:
           poetry run pylint pyweatherflowudp
           poetry run pydocstyle pyweatherflowudp tests
       - name: Run mypy
-        run: poetry run mypy pyweatherflowudp tests
+        run: poetry run mypy pyweatherflowudp
       - name: Test with pytest
         run: poetry run pytest --timeout=10 --cov=pyweatherflowudp --asyncio-mode=auto
