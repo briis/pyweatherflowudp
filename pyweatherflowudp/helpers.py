@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from pint import Quantity
 from pint.unit import Unit
@@ -25,19 +25,15 @@ DIRECTIONS = [
     "NW",
     "NNW",
 ]
+DIRECTIONS_COUNT = len(DIRECTIONS)
 T = TypeVar("T")  # pylint: disable=invalid-name
 UTC = timezone.utc
 
 
 def degrees_to_cardinal(degree: float | Quantity[float]) -> str:
     """Convert degrees to a cardinal direction."""
-    return DIRECTIONS[
-        round(
-            (degree.m if isinstance(degree, Quantity) else degree)
-            / (360.0 / (directions_count := len(DIRECTIONS)))
-        )
-        % directions_count
-    ]
+    _deg = cast(float, degree.m if isinstance(degree, Quantity) else degree)
+    return DIRECTIONS[round(_deg / (360.0 / DIRECTIONS_COUNT)) % DIRECTIONS_COUNT]
 
 
 def nvl(value: T | None, default: T) -> T:
