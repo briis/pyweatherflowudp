@@ -1,6 +1,11 @@
+# 1.4.2 (2023-04-24)
+
+- Adjusted logic for `heat_index` to match [WeatherFlow documentation](https://weatherflow.github.io/Tempest/api/derived-metric-formulas.html#heat-index)
+- Add `feels_like_temperature` to calc.py
+
 # 1.4.1 (2022-07-11)
 
-- Adjusted logic for calculate_sea_level_pressure to match WeatherFlow (https://weatherflow.github.io/Tempest/api/derived-metric-formulas.html#sea-level-pressure)
+- Adjusted logic for calculate_sea_level_pressure to match [WeatherFlow documentation](https://weatherflow.github.io/Tempest/api/derived-metric-formulas.html#sea-level-pressure)
 
 # 1.4.0 (2022-06-10)
 
