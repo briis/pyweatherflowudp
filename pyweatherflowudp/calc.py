@@ -69,6 +69,21 @@ def dew_point_temperature(
     ).to(air_temperature.u)
 
 
+def feels_like_temperature(
+    air_temperature: Quantity[float],
+    relative_humidity: Quantity[float],
+    wind_speed: Quantity[float],
+) -> Quantity[float] | None:
+    """Calculate the "feels like" temperature."""
+    # fmt: off
+    if (temp := heat_index(air_temperature=air_temperature, relative_humidity=relative_humidity)) is not None:
+        return temp
+    if (temp := wind_chill(air_temperature=air_temperature, wind_speed=wind_speed)) is not None:
+        return temp
+    # fmt: on
+    return air_temperature
+
+
 def freezing_level(
     air_temperature: Quantity[float], altitude: Quantity[float]
 ) -> Quantity[float]:
