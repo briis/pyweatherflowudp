@@ -88,38 +88,27 @@ def heat_index(
 ) -> Quantity[float] | None:
     """Calculate the heat index.
 
-    Only temperatures >= 80°F (26.66°C) have a heat index.
+    Only temperatures >= 80°F (26.66°C) and relative humidity >= 40% have a heat index.
     """
     temp_fahrenheit = air_temperature.to("degF").m
-
-    if temp_fahrenheit < 80:
-        return None
-
     rh_percent = relative_humidity.m * (
         1 if relative_humidity.u == UNIT_PERCENT or relative_humidity.m > 1 else 100
     )
+    if temp_fahrenheit < 80 or rh_percent < 40:
+        return None
 
-    heat_idx = 0.5 * (
-        temp_fahrenheit + 61.0 + ((temp_fahrenheit - 68.0) * 1.2) + (rh_percent * 0.094)
+    heat_idx = (
+        -42.379
+        + 2.04901523 * temp_fahrenheit
+        + 10.14333127 * rh_percent
+        - 0.22475541 * temp_fahrenheit * rh_percent
+        - 0.00683783 * temp_fahrenheit**2
+        - 0.05481717 * rh_percent**2
+        + 0.00122874 * temp_fahrenheit**2 * rh_percent
+        + 0.00085282 * temp_fahrenheit * rh_percent**2
+        - 0.00000199 * temp_fahrenheit**2 * rh_percent**2
     )
-    if (heat_idx + temp_fahrenheit) / 2 >= 80:
-        heat_idx = (
-            -42.379
-            + 2.04901523 * temp_fahrenheit
-            + 10.14333127 * rh_percent
-            - 0.22475541 * temp_fahrenheit * rh_percent
-            - 0.00683783 * temp_fahrenheit * temp_fahrenheit
-            - 0.05481717 * rh_percent * rh_percent
-            + 0.00122874 * temp_fahrenheit * temp_fahrenheit * rh_percent
-            + 0.00085282 * temp_fahrenheit * rh_percent * rh_percent
-            - 0.00000199 * temp_fahrenheit * temp_fahrenheit * rh_percent * rh_percent
-        )
-        if rh_percent < 13 and (80 <= temp_fahrenheit <= 112):
-            heat_idx -= ((13 - rh_percent) / 4) * (
-                (17 - abs(temp_fahrenheit - 95.0)) / 17
-            ) ** 0.5
-        elif rh_percent > 85 and (80 <= temp_fahrenheit <= 87):
-            heat_idx += ((rh_percent - 85) / 10) * ((87 - temp_fahrenheit) / 5)
+
     return (heat_idx * units.degF).to(air_temperature.u)
 
 
@@ -187,7 +176,6 @@ def wind_chill(
     """
     temp_fahrenheit = air_temperature.to("degF").m
     wind_mph = wind_speed.to("mph").m
-
     if temp_fahrenheit > 50 or wind_mph < 3:
         return None
 
