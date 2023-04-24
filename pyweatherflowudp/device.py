@@ -7,7 +7,7 @@ from typing import Any, Callable, final
 
 from pint import Quantity
 
-from .calc import wind_chill
+from .calc import feels_like_temperature, wind_chill
 from .const import (
     EVENT_OBSERVATION_AIR,
     EVENT_OBSERVATION_SKY,
@@ -475,11 +475,13 @@ class TempestDevice(AirSensorType, SkySensorType):
     @property
     def feels_like_temperature(self) -> Quantity[float] | None:
         """Return the feels like temperature in degrees Celsius (°C)."""
-        if self.heat_index is not None:
-            return self.heat_index
-        if self.wind_chill_temperature is not None:
-            return self.wind_chill_temperature
-        return self.air_temperature
+        if None in (self.air_temperature, self.relative_humidity, self.wind_speed):
+            return None
+        return feels_like_temperature(
+            air_temperature=self.air_temperature,
+            relative_humidity=self.relative_humidity,
+            wind_speed=self.wind_speed,
+        )
 
     @property
     def wind_chill_temperature(self) -> Quantity[float] | None:

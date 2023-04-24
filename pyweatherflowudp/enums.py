@@ -13,7 +13,7 @@ class PrecipitationType(IntEnum):
     HAIL = 2
     RAIN_HAIL = 3
 
-    # Handle unknown/future fan modes
+    # Handle unknown/future precipitation types
     UNKNOWN = -1
 
     @classmethod
@@ -31,7 +31,7 @@ class RadioStatus(IntEnum):
     RADIO_ACTIVE = 3
     BLE_CONNECTED = 7
 
-    # Handle unknown/future fan modes
+    # Handle unknown/future radio statuses
     UNKNOWN = -1
 
     @classmethod
