@@ -419,19 +419,25 @@ files = [
 
 [[package]]
 name = "pint"
-version = "0.19.2"
+version = "0.21"
 description = "Physical quantities module"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Pint-0.19.2.tar.gz", hash = "sha256:e1d4989ff510b378dad64f91711e7bdabe5ca78d75b06a18569ac454678c4baf"},
+    {file = "Pint-0.21-py3-none-any.whl", hash = "sha256:998b695e84a34d11702da4a8b9457a39bb5c7ab5ec68db90e948e30878e421f1"},
+    {file = "Pint-0.21.tar.gz", hash = "sha256:3e98bdf01f4dcf840cc0207c0b6f7510d4e0c6288efc1bf470626e875c831172"},
 ]
 
 [package.extras]
+babel = ["babel (<=2.8)"]
+dask = ["dask"]
+mip = ["mip (>=1.13)"]
 numpy = ["numpy (>=1.19.5)"]
+pandas = ["pint-pandas (>=0.3)"]
 test = ["pytest", "pytest-cov", "pytest-mpl", "pytest-subtests"]
 uncertainties = ["uncertainties (>=3.1.6)"]
+xarray = ["xarray"]
 
 [[package]]
 name = "platformdirs"
@@ -818,4 +824,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "67ed2336f8f1ac810c63efbde24fc476835897b0a3a69a5ae31f3cff3042a191"
+content-hash = "e41d735e6bb6f440e8999611deda75b3cce894051349649665d0564033fbecda"
