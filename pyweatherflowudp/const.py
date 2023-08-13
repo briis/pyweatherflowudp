@@ -12,12 +12,11 @@ units = pint.UnitRegistry(
             r"(?<=[A-Za-z])(?![A-Za-z])(?<![0-9\-][eE])(?<![0-9\-])(?=[0-9\-])",
             "**",
         ),
-        lambda string: string.replace("%", "percent"),
     ],
 )
-units.define(
-    pint.unit.UnitDefinition("percent", "%", (), pint.converters.ScaleConverter(0.01))
-)
+if not hasattr(units, "percent"):
+    units.preprocessors.append(lambda string: string.replace("%", "percent"))
+    units.define("percent = 100 = %")
 units.default_format = "P~"
 
 DEFAULT_HOST = "0.0.0.0"

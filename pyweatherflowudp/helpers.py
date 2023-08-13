@@ -4,8 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, TypeVar, cast
 
-from pint import Quantity
-from pint.unit import Unit
+from pint import Quantity, Unit
 
 DIRECTIONS = [
     "N",
