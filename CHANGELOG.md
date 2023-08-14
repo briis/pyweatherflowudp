@@ -1,3 +1,7 @@
+# 1.4.3 (2023-08-13)
+
+- Support Pint >=0.19
+
 # 1.4.2 (2023-04-24)
 
 - Adjusted logic for `heat_index` to match [WeatherFlow documentation](https://weatherflow.github.io/Tempest/api/derived-metric-formulas.html#heat-index)
