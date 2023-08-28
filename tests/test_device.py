@@ -34,7 +34,7 @@ from pyweatherflowudp.device import (
     SkyDevice,
     TempestDevice,
 )
-from pyweatherflowudp.enums import PrecipitationType
+from pyweatherflowudp.enums import PowerSaveMode, PrecipitationType
 
 SERIAL_NUMBER = "00000001"
 HUB_SERIAL_NUMBER = f"HB-{SERIAL_NUMBER}"
@@ -73,7 +73,6 @@ def test_air_device(obs_air: dict[str, Any]) -> None:
     assert device.serial_number == AIR_SERIAL_NUMBER
     assert device.hub_sn == HUB_SERIAL_NUMBER
 
-    assert device.battery == 0 * UNIT_VOLTS
     device.parse_message(obs_air)
     assert device.air_temperature == 10.0 * UNIT_DEGREES_CELSIUS
     assert device.battery == 3.46 * UNIT_VOLTS
@@ -96,7 +95,6 @@ def test_sky_device(obs_sky: dict[str, Any]) -> None:
     assert device.serial_number == SKY_SERIAL_NUMBER
     assert device.hub_sn == HUB_SERIAL_NUMBER
 
-    assert device.battery == 0 * UNIT_VOLTS
     device.parse_message(obs_sky)
     assert device.battery == 3.12 * UNIT_VOLTS
     assert device.illuminance == 9000 * UNIT_LUX
@@ -167,13 +165,13 @@ def test_tempest_device(
     assert device.last_lightning_strike_event.distance == 27 * UNIT_KILOMETERS
     assert device.last_lightning_strike_event.energy == 3848
 
-    assert device.battery == 0 * UNIT_VOLTS
     device.parse_message(obs_st)
     assert device.air_temperature == 22.37 * UNIT_DEGREES_CELSIUS
     assert device.battery == 2.410 * UNIT_VOLTS
     assert device.illuminance == 328 * UNIT_LUX
     assert device.lightning_strike_average_distance == 0 * UNIT_KILOMETERS
     assert device.lightning_strike_count == 0
+    assert device.power_save_mode == PowerSaveMode.MODE_1
     assert device.precipitation_type == PrecipitationType.NONE
     assert device.rain_accumulation_previous_minute == 0.01 * UNIT_MILLIMETERS
     assert str(device.rain_accumulation_previous_minute) == "0.01 mm"
@@ -267,6 +265,7 @@ def test_tempest_device_low_voltage(
     assert device.wind_direction_average is None
     assert device.wind_sample_interval == 300 * UNIT_SECONDS
     assert device.battery == 2.358 * UNIT_VOLTS
+    assert device.power_save_mode == PowerSaveMode.MODE_3
 
 
 def test_tempest_null_values(obs_st_nulls: dict[str, Any]) -> None:

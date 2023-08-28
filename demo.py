@@ -62,15 +62,14 @@ async def main():
                         device.feels_like_temperature.to("degF"),
                     )
 
-        event_lambda = lambda event: device_event(event)
-        device.on(EVENT_LOAD_COMPLETE, event_lambda)
-        device.on(EVENT_OBSERVATION, event_lambda)
-        device.on(EVENT_STATUS_UPDATE, event_lambda)
+        device.on(EVENT_LOAD_COMPLETE, device_event)
+        device.on(EVENT_OBSERVATION, device_event)
+        device.on(EVENT_STATUS_UPDATE, device_event)
         if isinstance(device, AirSensorType):
-            device.on(EVENT_STRIKE, event_lambda)
+            device.on(EVENT_STRIKE, device_event)
         if isinstance(device, SkySensorType):
-            device.on(EVENT_RAIN_START, event_lambda)
-            device.on(EVENT_RAPID_WIND, event_lambda)
+            device.on(EVENT_RAIN_START, device_event)
+            device.on(EVENT_RAPID_WIND, device_event)
 
     try:
         async with WeatherFlowListener() as client:

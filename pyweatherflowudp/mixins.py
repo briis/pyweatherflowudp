@@ -68,7 +68,7 @@ class EventMixin:
 class BaseSensorMixin:
     """Base sensor mixin."""
 
-    _battery: float | None = 0
+    _battery: float | None = None
     _last_report: int | None = None
     _report_interval: int | None = 0
 

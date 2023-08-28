@@ -5,6 +5,24 @@ from enum import IntEnum, unique
 
 
 @unique
+class PowerSaveMode(IntEnum):
+    """Power save modes."""
+
+    MODE_0 = 0
+    MODE_1 = 1
+    MODE_2 = 2
+    MODE_3 = 3
+
+    # Handle unknown/future power save modes
+    UNKNOWN = -1
+
+    @classmethod
+    def _missing_(cls, _: object) -> PowerSaveMode:  # pragma: no cover
+        """Return default if not found."""
+        return cls.UNKNOWN
+
+
+@unique
 class PrecipitationType(IntEnum):
     """Precipitation types."""
 

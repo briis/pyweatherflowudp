@@ -14,7 +14,7 @@ units = pint.UnitRegistry(
         ),
     ],
 )
-if not hasattr(units, "percent"):
+if not hasattr(units, "percent"):  # pragma: no cover
     units.preprocessors.append(lambda string: string.replace("%", "percent"))
     units.define("percent = 100 = %")
 units.default_format = "P~"

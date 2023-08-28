@@ -20,6 +20,7 @@ from .const import (
     UNIT_DECIBELS,
     UNIT_SECONDS,
 )
+from .enums import PowerSaveMode
 from .event import CustomEvent, LightningStrikeEvent, RainStartEvent, WindEvent
 from .helpers import truebool, utc_timestamp_from_epoch
 from .mixins import AirSensorMixin, BaseSensorMixin, EventMixin, SkySensorMixin
@@ -65,6 +66,12 @@ STRIKE_EVENT_ENERGY = 2
 WIND_OBSERVATION_TIMESTAMP = 0
 WIND_OBSERVATION_SPEED = 1
 WIND_OBSERVATION_DIRECTION = 2
+WIND_SAMPLE_INTERVAL_POWER_SAVE_MODE_MAP = {
+    3: PowerSaveMode.MODE_0,
+    6: PowerSaveMode.MODE_1,
+    60: PowerSaveMode.MODE_2,
+    300: PowerSaveMode.MODE_3,
+}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -469,6 +476,16 @@ class TempestDevice(AirSensorType, SkySensorType):
         16: "_battery",
         17: "_report_interval",
     }
+
+    @property
+    def power_save_mode(self) -> PowerSaveMode:
+        """Return the power save mode.
+
+        https://help.weatherflow.com/hc/en-us/articles/360048877194-Solar-Power-Rechargeable-Battery
+        """
+        return WIND_SAMPLE_INTERVAL_POWER_SAVE_MODE_MAP.get(
+            self._wind_sample_interval, PowerSaveMode.UNKNOWN  # type: ignore
+        )
 
     # Derived metrics
 
