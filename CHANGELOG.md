@@ -1,3 +1,7 @@
+# 1.4.4 (2023-08-28)
+
+- Add `power_save_mode` property to Tempest devices
+
 # 1.4.3 (2023-08-13)
 
 - Support Pint >=0.19
