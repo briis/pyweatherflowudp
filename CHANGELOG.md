@@ -1,3 +1,7 @@
+# 1.4.5 (2023-10-10)
+
+- Fix `vapor_pressure` property calculation
+
 # 1.4.4 (2023-08-28)
 
 - Add `power_save_mode` property to Tempest devices
