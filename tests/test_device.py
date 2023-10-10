@@ -195,7 +195,7 @@ def test_tempest_device(
     assert round(device.dew_point_temperature, 5) == 11.52825 * UNIT_DEGREES_CELSIUS
     assert device.feels_like_temperature == 22.37 * UNIT_DEGREES_CELSIUS
     assert device.heat_index is None
-    assert round(device.vapor_pressure, 5) == 1359.55045 * UNIT_MILLIBARS
+    assert round(device.vapor_pressure, 5) == 13.59550 * UNIT_MILLIBARS
     assert round(device.wet_bulb_temperature, 5) == 15.77886 * UNIT_DEGREES_CELSIUS
     assert device.wind_chill_temperature is None
 

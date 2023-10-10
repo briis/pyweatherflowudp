@@ -9,6 +9,7 @@ from .const import (
     UNIT_KILOGRAMS_PER_CUBIC_METER,
     UNIT_METERS,
     UNIT_MILLIBARS,
+    UNIT_PASCAL,
     UNIT_PERCENT,
     units,
 )
@@ -162,8 +163,8 @@ def vapor_pressure(
                 else 1
             ),
         )
-        * UNIT_MILLIBARS
-    )
+        * UNIT_PASCAL
+    ).to(UNIT_MILLIBARS)
 
 
 def wet_bulb_temperature(
