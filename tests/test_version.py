@@ -1,4 +1,5 @@
 """Test the module version."""
+
 from pyweatherflowudp import __version__
 
 

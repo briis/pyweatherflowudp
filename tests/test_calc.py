@@ -1,4 +1,5 @@
 """Test calculations."""
+
 from pyweatherflowudp.calc import heat_index, vapor_pressure
 from pyweatherflowudp.const import (
     UNIT_DEGREES_CELSIUS,

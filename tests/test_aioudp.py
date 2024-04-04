@@ -1,4 +1,5 @@
 """Test UDP socket connection."""
+
 import asyncio
 
 import pytest

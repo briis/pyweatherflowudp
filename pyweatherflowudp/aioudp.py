@@ -2,6 +2,7 @@
 
 Copied/modified from https://gist.github.com/vxgmichel/e47bff34b68adb3cf6bd4845c4bed448
 """
+
 from __future__ import annotations
 
 __all__ = ["open_local_endpoint", "open_remote_endpoint"]

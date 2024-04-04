@@ -1,4 +1,5 @@
 """Events for WeatherFlow devices."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
