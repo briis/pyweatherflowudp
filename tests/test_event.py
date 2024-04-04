@@ -1,4 +1,5 @@
 """Test the module version."""
+
 from datetime import datetime, timezone
 
 from pyweatherflowudp.event import CustomEvent

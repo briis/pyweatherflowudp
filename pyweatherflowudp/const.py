@@ -1,4 +1,5 @@
 """WeatherFlow constants."""
+
 import functools
 import re
 

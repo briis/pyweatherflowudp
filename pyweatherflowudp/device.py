@@ -1,4 +1,5 @@
 """WeatherFlow devices."""
+
 from __future__ import annotations
 
 import logging
@@ -484,7 +485,8 @@ class TempestDevice(AirSensorType, SkySensorType):
         https://help.weatherflow.com/hc/en-us/articles/360048877194-Solar-Power-Rechargeable-Battery
         """
         return WIND_SAMPLE_INTERVAL_POWER_SAVE_MODE_MAP.get(
-            self._wind_sample_interval, PowerSaveMode.UNKNOWN  # type: ignore
+            self._wind_sample_interval,  # type: ignore
+            PowerSaveMode.UNKNOWN,
         )
 
     # Derived metrics

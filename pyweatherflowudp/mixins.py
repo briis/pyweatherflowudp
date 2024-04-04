@@ -1,4 +1,5 @@
 """Mixins for WeatherFlow client and sensors."""
+
 from __future__ import annotations
 
 import logging
