@@ -15,13 +15,13 @@ Pint = ">=0.19"
 PsychroLib = "^2.5.0"
 
 [tool.poetry.group.test.dependencies]
-mypy = ">=0.991,<1.12"
+mypy = ">=0.991,<1.14"
 pytest = ">=7.1,<9.0"
 pytest-asyncio = ">=0.20,<0.25"
 pytest-cov = ">=4,<6"
 pytest-timeout = "^2.0.1"
 tox = "^4.0.18"
-ruff = ">=0.5.0,<0.7"
+ruff = ">=0.5.0,<0.9"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
