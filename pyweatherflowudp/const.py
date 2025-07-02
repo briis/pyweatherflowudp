@@ -18,7 +18,7 @@ units = pint.UnitRegistry(
 if not hasattr(units, "percent"):  # pragma: no cover
     units.preprocessors.append(lambda string: string.replace("%", "percent"))
     units.define("percent = 100 = %")
-units.default_format = "P~"
+units.formatter.default_format = "P~"
 
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 50222

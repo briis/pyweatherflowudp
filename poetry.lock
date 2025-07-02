@@ -173,6 +173,42 @@ testing = ["covdefaults (>=2.3)", "coverage (>=7.6.1)", "diff-cover (>=9.2)", "p
 typing = ["typing-extensions (>=4.12.2) ; python_version < \"3.11\""]
 
 [[package]]
+name = "flexcache"
+version = "0.3"
+description = "Saves and loads to the cache a transformed versions of a source object."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "flexcache-0.3-py3-none-any.whl", hash = "sha256:d43c9fea82336af6e0115e308d9d33a185390b8346a017564611f1466dcd2e32"},
+    {file = "flexcache-0.3.tar.gz", hash = "sha256:18743bd5a0621bfe2cf8d519e4c3bfdf57a269c15d1ced3fb4b64e0ff4600656"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+
+[package.extras]
+test = ["pytest", "pytest-cov", "pytest-mpl", "pytest-subtests"]
+
+[[package]]
+name = "flexparser"
+version = "0.4"
+description = "Parsing made fun ... using typing."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "flexparser-0.4-py3-none-any.whl", hash = "sha256:3738b456192dcb3e15620f324c447721023c0293f6af9955b481e91d00179846"},
+    {file = "flexparser-0.4.tar.gz", hash = "sha256:266d98905595be2ccc5da964fe0a2c3526fbbffdc45b65b3146d75db992ef6b2"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+
+[package.extras]
+test = ["pytest", "pytest-cov", "pytest-mpl", "pytest-subtests"]
+
+[[package]]
 name = "iniconfig"
 version = "2.1.0"
 description = "brain-dead simple config-ini parsing"
@@ -258,23 +294,31 @@ files = [
 
 [[package]]
 name = "pint"
-version = "0.21.1"
+version = "0.24.4"
 description = "Physical quantities module"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "Pint-0.21.1-py3-none-any.whl", hash = "sha256:230ebccc312693117ee925c6492b3631c772ae9f7851a4e86080a15e7be692d8"},
-    {file = "Pint-0.21.1.tar.gz", hash = "sha256:5d5b6b518d0c5a7ab03a776175db500f1ed1523ee75fb7fafe38af8149431c8d"},
+    {file = "Pint-0.24.4-py3-none-any.whl", hash = "sha256:aa54926c8772159fcf65f82cc0d34de6768c151b32ad1deb0331291c38fe7659"},
+    {file = "pint-0.24.4.tar.gz", hash = "sha256:35275439b574837a6cd3020a5a4a73645eb125ce4152a73a2f126bf164b91b80"},
 ]
+
+[package.dependencies]
+flexcache = ">=0.3"
+flexparser = ">=0.4"
+platformdirs = ">=2.1.0"
+typing-extensions = ">=4.0.0"
 
 [package.extras]
 babel = ["babel (<=2.8)"]
+bench = ["pytest", "pytest-codspeed"]
 dask = ["dask"]
 mip = ["mip (>=1.13)"]
-numpy = ["numpy (>=1.19.5)"]
+numpy = ["numpy (>=1.23)"]
 pandas = ["pint-pandas (>=0.3)"]
-test = ["pytest", "pytest-cov", "pytest-mpl", "pytest-subtests"]
+test = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-mpl", "pytest-subtests"]
+testbase = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-subtests"]
 uncertainties = ["uncertainties (>=3.1.6)"]
 xarray = ["xarray"]
 
@@ -284,7 +328,7 @@ version = "4.3.6"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.8"
-groups = ["test"]
+groups = ["main", "test"]
 files = [
     {file = "platformdirs-4.3.6-py3-none-any.whl", hash = "sha256:73e575e1408ab8103900836b97580d5307456908a03e92031bab39e4554cc3fb"},
     {file = "platformdirs-4.3.6.tar.gz", hash = "sha256:357fb2acbc885b0419afd3ce3ed34564c13c9b95c89360cd9563f73aa5e2b907"},
@@ -523,7 +567,7 @@ version = "4.13.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
-groups = ["test"]
+groups = ["main", "test"]
 files = [
     {file = "typing_extensions-4.13.2-py3-none-any.whl", hash = "sha256:a439e7c04b49fec3e5d3e2beaa21755cadbbdc391694e28ccdd36ca4a1408f8c"},
     {file = "typing_extensions-4.13.2.tar.gz", hash = "sha256:e6c81219bd689f51865d9e372991c540bda33a0379d5573cddb9a3a23f7caaef"},
@@ -553,4 +597,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "c4abafe5823b5eca7c92c7d639a167e159bc852239adc7fe46d13678941e025e"
+content-hash = "3b8c4fe618792b09395dbfbe35f180a57f954e21d19f760487a85603bc1bdeeb"
