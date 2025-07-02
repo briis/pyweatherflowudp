@@ -509,6 +509,13 @@ class TempestDevice(AirSensorType, SkySensorType):
             return None
         return wind_chill(self.air_temperature, self.wind_speed)
 
+    @property
+    def heat_index(self) -> Quantity[float] | None:
+        """Return the calculated heat index in degrees Celsius (°C)."""
+        if None in (self.air_temperature, self.relative_humidity):
+            return None
+        return heat_index(self.air_temperature, self.relative_humidity)
+
 
 SERIAL_MAP = {"HB": HubDevice, "AR": AirDevice, "SK": SkyDevice, "ST": TempestDevice}
 
