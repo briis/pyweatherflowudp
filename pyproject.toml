@@ -21,7 +21,7 @@ pytest-asyncio = ">=0.20,<0.25"
 pytest-cov = ">=4,<6"
 pytest-timeout = "^2.0.1"
 tox = "^4.0.18"
-ruff = ">=0.5.0,<0.7"
+ruff = ">=0.5.0,<0.13"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
