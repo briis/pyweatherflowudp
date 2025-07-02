@@ -68,16 +68,22 @@ async def test_process_message(
 
 async def test_listener_connection_errors(listener: WeatherFlowListener) -> None:
     """Test listener connection errors."""
-    with patch(
-        "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
-        side_effect=OSError(48, "Address already in use"),
-    ), pytest.raises(AddressInUseError):
+    with (
+        patch(
+            "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
+            side_effect=OSError(48, "Address already in use"),
+        ),
+        pytest.raises(AddressInUseError),
+    ):
         await listener.start_listening()
 
-    with patch(
-        "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
-        side_effect=OSError(48, "Some other error"),
-    ), pytest.raises(EndpointError):
+    with (
+        patch(
+            "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
+            side_effect=OSError(48, "Some other error"),
+        ),
+        pytest.raises(EndpointError),
+    ):
         await listener.start_listening()
 
 
