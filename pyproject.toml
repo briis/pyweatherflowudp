@@ -1,28 +1,43 @@
-[tool.poetry]
+[project]
 name = "pyweatherflowudp"
-version = "1.4.5"
 description = "An event-based asynchronous library to read UDP packets from Weatherflow weather systems on a local network without any reliance on the cloud."
 license = "MIT"
-authors = ["Nathan Spencer <natekspencer@gmail.com>"]
 readme = "README.md"
-homepage = "https://github.com/briis/pyweatherflowudp"
-repository = "https://github.com/briis/pyweatherflowudp"
+requires-python = ">=3.10"
+authors = [
+    { name = "Nathan Spencer", email = "natekspencer@gmail.com" }
+]
 keywords = ["WeatherFlow", "UDP", "asynchronous", "local"]
+dependencies = [
+    "Pint>=0.24",
+    "PsychroLib>=2.5.0"
+]
+dynamic = [ "version" ]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-Pint = ">=0.24"
-PsychroLib = "^2.5.0"
+[project.urls]
+homepage = "https://github.com/natekspencer/pyweatherflowudp"
+repository = "https://github.com/natekspencer/pyweatherflowudp"
 
-[tool.poetry.group.test.dependencies]
-mypy = ">=0.991,<1.19"
-pytest = ">=7.1,<9.0"
-pytest-asyncio = ">=0.20,<1.3"
-pytest-cov = ">=4,<8"
-pytest-timeout = "^2.0.1"
-tox = "^4.0.18"
-ruff = ">=0.5.0,<0.14"
+[tool.poetry]
+version = "0.0.0"
+include = ["pyweatherflowudp/py.typed"]
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.19.1"
+pre-commit = "^4.5.1"
+pytest = "^9.0.2"
+pytest-asyncio = "^1.3.0"
+pytest-cov = "^7.0.0"
+pytest-timeout = "^2.4.0"
+ruff = "^0.14.11"
+tox = "^4.34.1"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "semver"
+pattern = "default-unprefixed"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
