@@ -9,8 +9,8 @@ authors = [
 ]
 keywords = ["WeatherFlow", "UDP", "asynchronous", "local"]
 dependencies = [
-    "Pint (>=0.24)",
-    "PsychroLib (>=2.5.0)"
+    "Pint>=0.24",
+    "PsychroLib>=2.5.0"
 ]
 dynamic = [ "version" ]
 
