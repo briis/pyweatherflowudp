@@ -1,0 +1,32 @@
+repos:
+  - repo: local
+    hooks:
+      # Validate poetry configuration.
+      - id: poetry-check
+        name: poetry check
+        entry: poetry check
+        language: system
+        pass_filenames: false
+
+      # Update poetry lock file.
+      - id: poetry-lock
+        name: poetry lock
+        entry: poetry lock
+        language: system
+        pass_filenames: false
+
+      # Run the linter.
+      - id: ruff
+        name: ruff
+        entry: ruff check --fix --exit-non-zero-on-fix
+        language: system
+        types: [python]
+        require_serial: true
+
+      # Run the formatter.
+      - id: ruff-format
+        name: ruff format
+        entry: ruff format
+        language: system
+        types: [python]
+        require_serial: true
