@@ -8,7 +8,12 @@ from typing import Any, Callable, final
 
 from pint import Quantity
 
-from .calc import feels_like_temperature, wind_chill
+from .calc import (
+    alkaline_battery_soc,
+    feels_like_temperature,
+    lto_battery_soc,
+    wind_chill,
+)
 from .const import (
     EVENT_OBSERVATION_AIR,
     EVENT_OBSERVATION_SKY,
@@ -25,6 +30,7 @@ from .enums import PowerSaveMode
 from .event import CustomEvent, LightningStrikeEvent, RainStartEvent, WindEvent
 from .helpers import truebool, utc_timestamp_from_epoch
 from .mixins import AirSensorMixin, BaseSensorMixin, EventMixin, SkySensorMixin
+
 
 DATA_DEBUG = "debug"
 DATA_EVENT = "evt"
@@ -427,6 +433,15 @@ class AirDevice(AirSensorType):
         7: "_report_interval",
     }
 
+    @property
+    def battery_percent(self) -> float:
+        """Return the battery level as a percentage.
+
+        The WeatherFlow Air has four batteries arranged as two parallel
+        pairs, each pair is two batteries in series.
+        """
+        return alkaline_battery_soc(self.battery / 2)
+
 
 class SkyDevice(SkySensorType):
     """Represents a WeatherFlow Sky device."""
@@ -449,6 +464,15 @@ class SkyDevice(SkySensorType):
         12: "_precipitation_type",
         13: "_wind_sample_interval",
     }
+
+    @property
+    def battery_percent(self) -> float:
+        """Return the battery level as a percentage.
+
+        The WeatherFlow SKY has eight batteries arranged as four parallel
+        pairs, each pair is two batteries in series.
+        """
+        return alkaline_battery_soc(self.battery / 2)
 
 
 class TempestDevice(AirSensorType, SkySensorType):
@@ -490,6 +514,11 @@ class TempestDevice(AirSensorType, SkySensorType):
         )
 
     # Derived metrics
+
+    @property
+    def battery_percent(self) -> float:
+        """Return the battery level as a percentage."""
+        return lto_battery_soc(self.battery)
 
     @property
     def feels_like_temperature(self) -> Quantity[float] | None:

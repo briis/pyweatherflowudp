@@ -1,10 +1,16 @@
 """Test calculations."""
 
-from pyweatherflowudp.calc import heat_index, vapor_pressure
+from pyweatherflowudp.calc import (
+    alkaline_battery_soc,
+    lto_battery_soc,
+    heat_index,
+    vapor_pressure,
+)
 from pyweatherflowudp.const import (
     UNIT_DEGREES_CELSIUS,
     UNIT_MILLIBARS,
     UNIT_PERCENT,
+    UNIT_VOLTS,
     units,
 )
 
@@ -22,6 +28,36 @@ def test_heat_index() -> None:
 
     temp_degrees = 10 * UNIT_DEGREES_CELSIUS
     assert heat_index(temp_degrees, relative_humidity) is None
+
+
+def test_alkaline_battery_soc() -> None:
+    """Test the battery voltage to percentage calculations."""
+
+    # below minimum
+    assert alkaline_battery_soc(0.5 * UNIT_VOLTS) == 0 * UNIT_PERCENT
+    # at minimum
+    assert alkaline_battery_soc(1.1 * UNIT_VOLTS) == 0 * UNIT_PERCENT
+    # interpolated
+    assert round(alkaline_battery_soc(1.35 * UNIT_VOLTS), 3) == 72.5 * UNIT_PERCENT
+    # at maximum
+    assert alkaline_battery_soc(1.59 * UNIT_VOLTS) == 100 * UNIT_PERCENT
+    # above maximum
+    assert alkaline_battery_soc(1.65 * UNIT_VOLTS) == 100 * UNIT_PERCENT
+
+
+def test_lto_battery_soc() -> None:
+    """Test the battery voltage to percentage calculations."""
+
+    # below minimum
+    assert lto_battery_soc(1.5 * UNIT_VOLTS) == 0 * UNIT_PERCENT
+    # at minimum
+    assert lto_battery_soc(2 * UNIT_VOLTS) == 0 * UNIT_PERCENT
+    # interpolated
+    assert round(lto_battery_soc(2.29 * UNIT_VOLTS), 3) == 62.5 * UNIT_PERCENT
+    # at maximum
+    assert lto_battery_soc(2.7 * UNIT_VOLTS) == 100 * UNIT_PERCENT
+    # above maximum
+    assert lto_battery_soc(2.8 * UNIT_VOLTS) == 100 * UNIT_PERCENT
 
 
 def test_vapor_pressure() -> None:

@@ -157,6 +157,7 @@ Base for "sky" sensor measurements (Sky/Tempest).
 
 | property                 | type     | description                                                 |
 | ------------------------ | -------- | ----------------------------------------------------------- |
+| battery_percent\*        | Quantity | The current battery level as a percentage.                  |
 | feels_like_temperature\* | Quantity | The calculated "feels like" temperature in degrees Celsius. |
 | wind_chill_temperature\* | Quantity | The calculated wind chill temperature in degrees Celsius.   |
 
