@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import psychrolib
 from pint import Quantity
 
@@ -12,8 +14,63 @@ from .const import (
     UNIT_MILLIBARS,
     UNIT_PASCAL,
     UNIT_PERCENT,
+    UNIT_VOLTS,
     units,
 )
+
+
+@dataclass
+class BatteryCurvePoint:
+    voltage: float
+    soc: float
+
+
+"""Points on the voltage-SOC curve for an alkaline battery.
+
+Source: https://www.ti.com/lit/an/slva194/slva194.pdf
+"""
+ALKALINE_BATTERY_CURVE = [
+    BatteryCurvePoint(1.10 * UNIT_VOLTS, 0 * UNIT_PERCENT),
+    BatteryCurvePoint(1.20 * UNIT_VOLTS, 10 * UNIT_PERCENT),
+    BatteryCurvePoint(1.23 * UNIT_VOLTS, 20 * UNIT_PERCENT),
+    BatteryCurvePoint(1.26 * UNIT_VOLTS, 30 * UNIT_PERCENT),
+    BatteryCurvePoint(1.28 * UNIT_VOLTS, 40 * UNIT_PERCENT),
+    BatteryCurvePoint(1.30 * UNIT_VOLTS, 50 * UNIT_PERCENT),
+    BatteryCurvePoint(1.32 * UNIT_VOLTS, 60 * UNIT_PERCENT),
+    BatteryCurvePoint(1.34 * UNIT_VOLTS, 70 * UNIT_PERCENT),
+    BatteryCurvePoint(1.38 * UNIT_VOLTS, 80 * UNIT_PERCENT),
+    BatteryCurvePoint(1.44 * UNIT_VOLTS, 90 * UNIT_PERCENT),
+    BatteryCurvePoint(1.59 * UNIT_VOLTS, 100 * UNIT_PERCENT),
+]
+
+"""Points on the voltage-SOC curve for a lithium-titanate (LTO) battery.
+
+The Tempest charges to a moximum of 2.80 V. The 100% SOC value is adjusted from this to allow
+reporting a high percentage with degraded (but still useful) batteries. The 0% value is chosen to
+match the discharge curve at lower outdoor temperatures.
+
+Sources:
+    "Influence of Battery Parametric Uncertainties on the State-of-Charge Estimation of
+        Lithium Titanate Oxide-Based Batteries", https://doi.org/10.3390/en11040795
+    "Solar Power & Rechargeable Battery",
+    https://help.tempest.earth/hc/en-us/articles/360048877194-Solar-Power-Rechargeable-Battery
+"""
+LTO_BATTERY_CURVE = [
+    BatteryCurvePoint(2.00 * UNIT_VOLTS, 0 * UNIT_PERCENT),
+    BatteryCurvePoint(2.10 * UNIT_VOLTS, 5 * UNIT_PERCENT),
+    BatteryCurvePoint(2.15 * UNIT_VOLTS, 10 * UNIT_PERCENT),
+    BatteryCurvePoint(2.16 * UNIT_VOLTS, 20 * UNIT_PERCENT),
+    BatteryCurvePoint(2.19 * UNIT_VOLTS, 30 * UNIT_PERCENT),
+    BatteryCurvePoint(2.20 * UNIT_VOLTS, 40 * UNIT_PERCENT),
+    BatteryCurvePoint(2.23 * UNIT_VOLTS, 50 * UNIT_PERCENT),
+    BatteryCurvePoint(2.28 * UNIT_VOLTS, 60 * UNIT_PERCENT),
+    BatteryCurvePoint(2.32 * UNIT_VOLTS, 70 * UNIT_PERCENT),
+    BatteryCurvePoint(2.40 * UNIT_VOLTS, 80 * UNIT_PERCENT),
+    BatteryCurvePoint(2.50 * UNIT_VOLTS, 90 * UNIT_PERCENT),
+    BatteryCurvePoint(2.52 * UNIT_VOLTS, 95 * UNIT_PERCENT),
+    BatteryCurvePoint(2.70 * UNIT_VOLTS, 100 * UNIT_PERCENT),
+]
+
 
 psychrolib.SetUnitSystem(psychrolib.SI)
 
@@ -205,3 +262,33 @@ def wind_chill(
         )
         * units.degF
     ).to(air_temperature.u)
+
+
+def alkaline_battery_soc(battery_voltage: Quantity[float]) -> Quantity[float]:
+    """Calculate the state of charge (SOC) for an alkaline battery voltage."""
+    return _battery_soc(battery_voltage, ALKALINE_BATTERY_CURVE)
+
+
+def lto_battery_soc(battery_voltage: Quantity[float]) -> Quantity[float]:
+    """Calculate the state of charge (SOC) for a lithium titanate (LTO) battery voltage."""
+    return _battery_soc(battery_voltage, LTO_BATTERY_CURVE)
+
+
+def _battery_soc(
+    battery_voltage: Quantity[float], battery_curve: list[BatteryCurvePoint]
+) -> Quantity[float]:
+    """Calculate the state of charge (SOC) for a given voltage and curve."""
+    if battery_voltage <= battery_curve[0].voltage:
+        return battery_curve[0].soc
+
+    if battery_voltage >= battery_curve[-1].voltage:
+        return battery_curve[-1].soc
+
+    for idx, left in enumerate(battery_curve[:-1]):
+        right = battery_curve[idx + 1]
+        if left.voltage <= battery_voltage <= right.voltage:
+            # Linear interpolation
+            pct_per_volt = (right.soc - left.soc) / (right.voltage - left.voltage)
+            return left.soc + pct_per_volt * (battery_voltage - left.voltage)
+
+    raise RuntimeError("Failed to determine battery SOC")
