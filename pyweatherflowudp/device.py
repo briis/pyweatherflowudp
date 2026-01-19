@@ -31,7 +31,6 @@ from .event import CustomEvent, LightningStrikeEvent, RainStartEvent, WindEvent
 from .helpers import truebool, utc_timestamp_from_epoch
 from .mixins import AirSensorMixin, BaseSensorMixin, EventMixin, SkySensorMixin
 
-
 DATA_DEBUG = "debug"
 DATA_EVENT = "evt"
 DATA_FIRMWARE_REVISION = "firmware_revision"
@@ -290,6 +289,11 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
             ]
         )
 
+    @property
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level as a percentage, or None if unknown."""
+        raise NotImplementedError
+
     def parse_device_status(self, data: dict[str, Any]) -> None:
         """Parse the device status."""
         old_up_since = (self._timestamp or 0) - self._uptime
@@ -434,12 +438,14 @@ class AirDevice(AirSensorType):
     }
 
     @property
-    def battery_percent(self) -> float:
-        """Return the battery level as a percentage.
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level (percentage), or None if unknown.
 
         The WeatherFlow Air has four batteries arranged as two parallel
         pairs, each pair is two batteries in series.
         """
+        if self.battery is None:
+            return None
         return alkaline_battery_soc(self.battery / 2)
 
 
@@ -466,12 +472,15 @@ class SkyDevice(SkySensorType):
     }
 
     @property
-    def battery_percent(self) -> float:
-        """Return the battery level as a percentage.
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level (percentage), or None if unknown.
 
         The WeatherFlow SKY has eight batteries arranged as four parallel
         pairs, each pair is two batteries in series.
         """
+        if self.battery is None:
+            return None
+
         return alkaline_battery_soc(self.battery / 2)
 
 
@@ -516,8 +525,11 @@ class TempestDevice(AirSensorType, SkySensorType):
     # Derived metrics
 
     @property
-    def battery_percent(self) -> float:
-        """Return the battery level as a percentage."""
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level (percentage), or None if unknown."""
+        if self.battery is None:
+            return None
+
         return lto_battery_soc(self.battery)
 
     @property

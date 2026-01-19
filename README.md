@@ -92,15 +92,18 @@ Base for hubs and sensors.
 
 Base for sensors.
 
-| property        | type     | description                                           |
-| --------------- | -------- | ----------------------------------------------------- |
-| battery         | Quantity | The current battery voltage.                          |
-| hub_rssi        | Quantity | The signal strength of the hub in decibels.           |
-| hub_sn          | str      | The serial number of the hub the sensor belongs to.   |
-| last_report     | datetime | The UTC timestamp from the last observation.          |
-| sensor_status   | list     | The list of issues the sensor is currently reporting. |
-| report_interval | Quantity | The report interval in minutes.                       |
-| reset_flags     | list     | The current reset flags of the hub.                   |
+| property          | type     | description                                           |
+| ----------------- | -------- | ----------------------------------------------------- |
+| battery           | Quantity | The current battery voltage.                          |
+| battery_percent\* | Quantity | The estimated battery level as a percentage.          |
+| hub_rssi          | Quantity | The signal strength of the hub in decibels.           |
+| hub_sn            | str      | The serial number of the hub the sensor belongs to.   |
+| last_report       | datetime | The UTC timestamp from the last observation.          |
+| sensor_status     | list     | The list of issues the sensor is currently reporting. |
+| report_interval   | Quantity | The report interval in minutes.                       |
+| reset_flags       | list     | The current reset flags of the hub.                   |
+
+\* Derived property
 
 ### AirSensorType
 
@@ -157,7 +160,6 @@ Base for "sky" sensor measurements (Sky/Tempest).
 
 | property                 | type     | description                                                 |
 | ------------------------ | -------- | ----------------------------------------------------------- |
-| battery_percent\*        | Quantity | The current battery level as a percentage.                  |
 | feels_like_temperature\* | Quantity | The calculated "feels like" temperature in degrees Celsius. |
 | wind_chill_temperature\* | Quantity | The calculated wind chill temperature in degrees Celsius.   |
 
