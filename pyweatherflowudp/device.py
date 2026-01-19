@@ -8,7 +8,12 @@ from typing import Any, Callable, final
 
 from pint import Quantity
 
-from .calc import feels_like_temperature, wind_chill
+from .calc import (
+    alkaline_battery_soc,
+    feels_like_temperature,
+    lto_battery_soc,
+    wind_chill,
+)
 from .const import (
     EVENT_OBSERVATION_AIR,
     EVENT_OBSERVATION_SKY,
@@ -284,6 +289,11 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
             ]
         )
 
+    @property
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level as a percentage, or None if unknown."""
+        raise NotImplementedError
+
     def parse_device_status(self, data: dict[str, Any]) -> None:
         """Parse the device status."""
         old_up_since = (self._timestamp or 0) - self._uptime
@@ -427,6 +437,17 @@ class AirDevice(AirSensorType):
         7: "_report_interval",
     }
 
+    @property
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level (percentage), or None if unknown.
+
+        The WeatherFlow Air has four batteries arranged as two parallel
+        pairs, each pair is two batteries in series.
+        """
+        if self.battery is None:
+            return None
+        return alkaline_battery_soc(self.battery / 2)
+
 
 class SkyDevice(SkySensorType):
     """Represents a WeatherFlow Sky device."""
@@ -449,6 +470,18 @@ class SkyDevice(SkySensorType):
         12: "_precipitation_type",
         13: "_wind_sample_interval",
     }
+
+    @property
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level (percentage), or None if unknown.
+
+        The WeatherFlow SKY has eight batteries arranged as four parallel
+        pairs, each pair is two batteries in series.
+        """
+        if self.battery is None:
+            return None
+
+        return alkaline_battery_soc(self.battery / 2)
 
 
 class TempestDevice(AirSensorType, SkySensorType):
@@ -490,6 +523,14 @@ class TempestDevice(AirSensorType, SkySensorType):
         )
 
     # Derived metrics
+
+    @property
+    def battery_percent(self) -> Quantity[float] | None:
+        """Return the estimated battery level (percentage), or None if unknown."""
+        if self.battery is None:
+            return None
+
+        return lto_battery_soc(self.battery)
 
     @property
     def feels_like_temperature(self) -> Quantity[float] | None:
