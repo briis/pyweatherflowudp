@@ -129,6 +129,6 @@ class WeatherFlowListener(EventMixin):
         await self.start_listening()
         return self
 
-    async def __aexit__(self, *exctype: Any) -> None:
+    async def __aexit__(self, *exctype: object) -> None:
         """Disconnect the socket."""
         await self.stop_listening()
