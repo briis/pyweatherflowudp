@@ -8,6 +8,7 @@ from __future__ import annotations
 __all__ = ["open_local_endpoint", "open_remote_endpoint"]
 
 import asyncio
+import socket
 import warnings
 from typing import Any
 
@@ -195,7 +196,17 @@ async def open_local_endpoint(
 
     An optional queue size arguement can be provided.
     Extra keyword arguments are forwarded to `loop.create_datagram_endpoint`.
+
+    Where the platform supports it, the socket is opened with
+    ``SO_REUSEPORT`` (callers can opt out with ``reuse_port=False``) so
+    other listeners for the same broadcast — a WeatherFlow hub announces
+    to the whole segment — can bind the port alongside this one instead
+    of failing with ``EADDRINUSE``. Sharing only works when every binder
+    opts in, so setting it here costs nothing when this is the only
+    listener and enables coexistence when it is not.
     """
+    if hasattr(socket, "SO_REUSEPORT"):
+        kwargs.setdefault("reuse_port", True)  # type: ignore[arg-type]
     return await open_datagram_endpoint(
         host,
         port,
