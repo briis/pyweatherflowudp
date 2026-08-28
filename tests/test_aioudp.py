@@ -1,6 +1,7 @@
 """Test UDP socket connection."""
 
 import asyncio
+import socket
 
 import pytest
 
@@ -95,3 +96,21 @@ async def test_flow_control() -> None:
 
     remote.abort()
     await remote.drain()
+
+
+async def test_shared_port() -> None:
+    """Test two local endpoints can share a port where supported."""
+    if not hasattr(socket, "SO_REUSEPORT"):
+        pytest.skip("SO_REUSEPORT is not supported on this platform")
+
+    first = await open_local_endpoint()
+    second = await open_local_endpoint(port=first.address[1])
+    assert second.address[1] == first.address[1]
+
+    # Callers can still opt out, restoring the exclusive-bind behavior.
+    with pytest.raises(OSError):
+        await open_local_endpoint(port=first.address[1], reuse_port=False)
+
+    first.abort()
+    second.abort()
+    assert first.closed and second.closed
