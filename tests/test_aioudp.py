@@ -104,13 +104,18 @@ async def test_shared_port() -> None:
         pytest.skip("SO_REUSEPORT is not supported on this platform")
 
     first = await open_local_endpoint()
-    second = await open_local_endpoint(port=first.address[1])
-    assert second.address[1] == first.address[1]
+    second = None
+    try:
+        second = await open_local_endpoint(port=first.address[1])
+        assert second.address[1] == first.address[1]
 
-    # Callers can still opt out, restoring the exclusive-bind behavior.
-    with pytest.raises(OSError):
-        await open_local_endpoint(port=first.address[1], reuse_port=False)
+        # Callers can still opt out, restoring the exclusive-bind behavior.
+        with pytest.raises(OSError):
+            await open_local_endpoint(port=first.address[1], reuse_port=False)
+    finally:
+        if second is not None and not second.closed:
+            second.abort()
+        if not first.closed:
+            first.abort()
 
-    first.abort()
-    second.abort()
     assert first.closed and second.closed
