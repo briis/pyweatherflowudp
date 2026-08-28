@@ -106,7 +106,12 @@ async def test_shared_port() -> None:
     first = await open_local_endpoint()
     second = None
     try:
-        second = await open_local_endpoint(port=first.address[1])
+        try:
+            second = await open_local_endpoint(port=first.address[1])
+        except OSError:
+            # SO_REUSEPORT is defined but the kernel lacks it: the endpoint
+            # fell back to an exclusive bind, so the port is simply occupied.
+            pytest.skip("kernel does not support SO_REUSEPORT")
         assert second.address[1] == first.address[1]
 
         # Callers can still opt out, restoring the exclusive-bind behavior.
