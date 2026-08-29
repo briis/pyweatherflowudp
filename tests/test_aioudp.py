@@ -1,6 +1,7 @@
 """Test UDP socket connection."""
 
 import asyncio
+import errno
 import socket
 
 import pytest
@@ -108,7 +109,9 @@ async def test_shared_port() -> None:
     try:
         try:
             second = await open_local_endpoint(port=first.address[1])
-        except OSError:
+        except OSError as exc:
+            if exc.errno != errno.EADDRINUSE:
+                raise
             # SO_REUSEPORT is defined but the kernel lacks it: the endpoint
             # fell back to an exclusive bind, so the port is simply occupied.
             pytest.skip("kernel does not support SO_REUSEPORT")
