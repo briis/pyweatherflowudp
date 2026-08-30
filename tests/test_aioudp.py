@@ -30,9 +30,9 @@ async def test_standard_behavior() -> None:
     local.abort()
     assert local.closed
 
+    await asyncio.sleep(1e-3)
+    remote.send(b"U there?")
     with pytest.warns(UserWarning):
-        await asyncio.sleep(1e-3)
-        remote.send(b"U there?")
         await asyncio.sleep(1e-3)
 
     remote.abort()
@@ -68,7 +68,7 @@ async def test_queue_size() -> None:
     remote.send(b"2")
     with pytest.warns(UserWarning):
         await asyncio.sleep(1e-3)
-        assert await local.receive() == (b"1", remote.address)
+    assert await local.receive() == (b"1", remote.address)
     remote.send(b"3")
     assert await local.receive() == (b"3", remote.address)
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from datetime import datetime
+from types import MappingProxyType
 from typing import Any, final
 
 from pint import Quantity
@@ -91,6 +92,7 @@ class WeatherFlowDevice(EventMixin):
     def __init__(self, serial_number: str, data: dict[str, Any] | None = None) -> None:
         """Initialize a WeatherFlow device."""
         # pylint: disable=unused-argument
+        super().__init__()
         self._serial_number = serial_number
         self._firmware_revision: str | None = None
         self._rssi: int = 0
@@ -223,21 +225,23 @@ class WeatherFlowSensorDevice(BaseSensorMixin, WeatherFlowDevice):
 
     _evt_observation: str = ""
 
-    OBSERVATION_VALUES_MAP: dict[int, str] = {}
+    OBSERVATION_VALUES_MAP: MappingProxyType[int, str] = MappingProxyType({})
 
-    SENSOR_STATUS_MASK = {
-        0b000000001: "Lightning Failed",
-        0b000000010: "Lightning Noise",
-        0b000000100: "Lightning Disturber",
-        0b000001000: "Pressure Failed",
-        0b000010000: "Temperature Failed",
-        0b000100000: "Relative Humidity Failed",
-        0b001000000: "Wind Failed",
-        0b010000000: "Precipitation Failed",
-        0b100000000: "Light/UV Failed",
-        0x00008000: "Power Booster Depleted",
-        0x00010000: "Power Booster Shore Power",
-    }
+    SENSOR_STATUS_MASK: MappingProxyType[int, str] = MappingProxyType(
+        {
+            0b000000001: "Lightning Failed",
+            0b000000010: "Lightning Noise",
+            0b000000100: "Lightning Disturber",
+            0b000001000: "Pressure Failed",
+            0b000010000: "Temperature Failed",
+            0b000100000: "Relative Humidity Failed",
+            0b001000000: "Wind Failed",
+            0b010000000: "Precipitation Failed",
+            0b100000000: "Light/UV Failed",
+            0x00008000: "Power Booster Depleted",
+            0x00010000: "Power Booster Shore Power",
+        }
+    )
 
     def __init__(self, serial_number: str, data: dict[str, Any] | None = None) -> None:
         """Initialize a WeatherFlow device."""
@@ -427,16 +431,18 @@ class AirDevice(AirSensorType):
     _attr_model = "Air"
     _evt_observation = EVENT_OBSERVATION_AIR
 
-    OBSERVATION_VALUES_MAP = {
-        0: "_last_report",
-        1: "_station_pressure",
-        2: "_air_temperature",
-        3: "_relative_humidity",
-        4: "_lightning_strike_count",
-        5: "_lightning_strike_average_distance",
-        6: "_battery",
-        7: "_report_interval",
-    }
+    OBSERVATION_VALUES_MAP = MappingProxyType(
+        {
+            0: "_last_report",
+            1: "_station_pressure",
+            2: "_air_temperature",
+            3: "_relative_humidity",
+            4: "_lightning_strike_count",
+            5: "_lightning_strike_average_distance",
+            6: "_battery",
+            7: "_report_interval",
+        }
+    )
 
     @property
     def battery_percent(self) -> Quantity[float] | None:
@@ -456,21 +462,23 @@ class SkyDevice(SkySensorType):
     _attr_model = "Sky"
     _evt_observation = EVENT_OBSERVATION_SKY
 
-    OBSERVATION_VALUES_MAP = {
-        0: "_last_report",
-        1: "_illuminance",
-        2: "_uv",
-        3: "_rain_accumulation_previous_minute",
-        4: "_wind_lull",
-        5: "_wind_average",
-        6: "_wind_gust",
-        7: "_wind_direction",
-        8: "_battery",
-        9: "_report_interval",
-        10: "_solar_radiation",
-        12: "_precipitation_type",
-        13: "_wind_sample_interval",
-    }
+    OBSERVATION_VALUES_MAP = MappingProxyType(
+        {
+            0: "_last_report",
+            1: "_illuminance",
+            2: "_uv",
+            3: "_rain_accumulation_previous_minute",
+            4: "_wind_lull",
+            5: "_wind_average",
+            6: "_wind_gust",
+            7: "_wind_direction",
+            8: "_battery",
+            9: "_report_interval",
+            10: "_solar_radiation",
+            12: "_precipitation_type",
+            13: "_wind_sample_interval",
+        }
+    )
 
     @property
     def battery_percent(self) -> Quantity[float] | None:
@@ -491,26 +499,28 @@ class TempestDevice(AirSensorType, SkySensorType):
     _attr_model = "Tempest"
     _evt_observation = EVENT_OBSERVATION_TEMPEST
 
-    OBSERVATION_VALUES_MAP = {
-        0: "_last_report",
-        1: "_wind_lull",
-        2: "_wind_average",
-        3: "_wind_gust",
-        4: "_wind_direction",
-        5: "_wind_sample_interval",
-        6: "_station_pressure",
-        7: "_air_temperature",
-        8: "_relative_humidity",
-        9: "_illuminance",
-        10: "_uv",
-        11: "_solar_radiation",
-        12: "_rain_accumulation_previous_minute",
-        13: "_precipitation_type",
-        14: "_lightning_strike_average_distance",
-        15: "_lightning_strike_count",
-        16: "_battery",
-        17: "_report_interval",
-    }
+    OBSERVATION_VALUES_MAP = MappingProxyType(
+        {
+            0: "_last_report",
+            1: "_wind_lull",
+            2: "_wind_average",
+            3: "_wind_gust",
+            4: "_wind_direction",
+            5: "_wind_sample_interval",
+            6: "_station_pressure",
+            7: "_air_temperature",
+            8: "_relative_humidity",
+            9: "_illuminance",
+            10: "_uv",
+            11: "_solar_radiation",
+            12: "_rain_accumulation_previous_minute",
+            13: "_precipitation_type",
+            14: "_lightning_strike_average_distance",
+            15: "_lightning_strike_count",
+            16: "_battery",
+            17: "_report_interval",
+        }
+    )
 
     @property
     def power_save_mode(self) -> PowerSaveMode:

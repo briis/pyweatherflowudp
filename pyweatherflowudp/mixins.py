@@ -45,7 +45,9 @@ _LOGGER = logging.getLogger(__name__)
 class EventMixin:
     """Event mixin."""
 
-    _listeners: dict[str, list[Callable]] = {}
+    def __init__(self) -> None:
+        """Initialize an event mixin."""
+        self._listeners: dict[str, list[Callable]] = {}
 
     def on(  # pylint: disable=invalid-name
         self, event_name: str, callback: Callable
