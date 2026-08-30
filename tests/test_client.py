@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import asyncio
+import errno
 import json
+import socket
 from typing import Any
 from unittest.mock import patch
 
@@ -71,7 +73,19 @@ async def test_listener_connection_errors(listener: WeatherFlowListener) -> None
     with (
         patch(
             "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
-            side_effect=OSError(48, "Address already in use"),
+            side_effect=OSError(errno.EADDRINUSE, "Address already in use"),
+        ),
+        pytest.raises(AddressInUseError),
+    ):
+        await listener.start_listening()
+
+    # The OS reports EADDRINUSE with platform- and locale-specific text
+    # (e.g. Windows or a non-English libc), so detection must not depend
+    # on the message.
+    with (
+        patch(
+            "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
+            side_effect=OSError(errno.EADDRINUSE, "Adresse déjà utilisée"),
         ),
         pytest.raises(AddressInUseError),
     ):
@@ -80,11 +94,23 @@ async def test_listener_connection_errors(listener: WeatherFlowListener) -> None
     with (
         patch(
             "asyncio.base_events.BaseEventLoop.create_datagram_endpoint",
-            side_effect=OSError(48, "Some other error"),
+            side_effect=OSError(errno.EACCES, "Permission denied"),
         ),
         pytest.raises(EndpointError),
     ):
         await listener.start_listening()
+
+
+async def test_address_in_use_real_bind() -> None:
+    """Test a real bind conflict raises AddressInUseError."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(("127.0.0.1", 0))
+    listener = WeatherFlowListener("127.0.0.1", sock.getsockname()[1])
+    try:
+        with pytest.raises(AddressInUseError):
+            await listener.start_listening()
+    finally:
+        sock.close()
 
 
 async def test_invalid_messages(

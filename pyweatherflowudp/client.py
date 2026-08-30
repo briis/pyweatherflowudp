@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import errno
 import json
 import logging
 from typing import Any
@@ -77,7 +78,9 @@ class WeatherFlowListener(EventMixin):
                 host=self._host, port=self._port
             )
         except OSError as ex:
-            if "Address already in use" in ex.args:
+            # Match on errno rather than the message: the text for
+            # EADDRINUSE varies by platform and locale.
+            if ex.errno == errno.EADDRINUSE:
                 raise AddressInUseError("Address already in use") from ex
             raise EndpointError("Could not open a local UDP endpoint") from ex
         _LOGGER.debug("Started listening")
