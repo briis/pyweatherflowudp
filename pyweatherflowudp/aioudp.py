@@ -102,7 +102,7 @@ class Endpoint:
     def send(self, data: bytes, addr: tuple[str, int] | None) -> None:
         """Send a datagram to the given address."""
         if self._closed:
-            raise IOError("Enpoint is closed")
+            raise OSError("Enpoint is closed")
         self._transport.sendto(data, addr)
 
     async def receive(self) -> tuple[bytes, tuple[str, int]]:
@@ -111,16 +111,16 @@ class Endpoint:
         This method is a coroutine.
         """
         if self._queue.empty() and self._closed:
-            raise IOError("Enpoint is closed")
+            raise OSError("Enpoint is closed")
         data, addr = await self._queue.get()
         if data is None:
-            raise IOError("Enpoint is closed")
+            raise OSError("Enpoint is closed")
         return data, addr
 
     def abort(self) -> None:
         """Close the transport immediately."""
         if self._closed:
-            raise IOError("Enpoint is closed")
+            raise OSError("Enpoint is closed")
         self._transport.abort()
         self.close()
 

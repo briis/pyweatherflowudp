@@ -7,6 +7,8 @@ import json
 import logging
 from typing import Any
 
+from typing_extensions import Self
+
 from .aioudp import LocalEndpoint, open_local_endpoint
 from .const import DEFAULT_HOST, DEFAULT_PORT
 from .device import (
@@ -35,6 +37,7 @@ class WeatherFlowListener(EventMixin):
         port: int = DEFAULT_PORT,
     ) -> None:
         """Initialize a WeatherFlow listener."""
+        super().__init__()
         self._host = host
         self._port = port
         self._devices: dict[str, WeatherFlowDevice] = {}
@@ -124,11 +127,11 @@ class WeatherFlowListener(EventMixin):
             self.emit(EVENT_DEVICE_DISCOVERED, self._devices[serial_number])
         self._devices[serial_number].parse_message(json_data)
 
-    async def __aenter__(self) -> WeatherFlowListener:
+    async def __aenter__(self) -> Self:
         """Connect the UDP socket and start listening for messages."""
         await self.start_listening()
         return self
 
-    async def __aexit__(self, *exctype: Any) -> None:
+    async def __aexit__(self, *exctype: object) -> None:
         """Disconnect the socket."""
         await self.stop_listening()
