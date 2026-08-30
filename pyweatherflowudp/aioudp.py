@@ -8,6 +8,7 @@ from __future__ import annotations
 __all__ = ["open_local_endpoint", "open_remote_endpoint"]
 
 import asyncio
+import socket
 import warnings
 from typing import Any
 
@@ -195,14 +196,43 @@ async def open_local_endpoint(
 
     An optional queue size arguement can be provided.
     Extra keyword arguments are forwarded to `loop.create_datagram_endpoint`.
+
+    Where the platform supports it, the socket is opened with
+    ``SO_REUSEPORT`` (callers can opt out with ``reuse_port=False``) so
+    other listeners for the same broadcast — a WeatherFlow hub announces
+    to the whole segment — can bind the port alongside this one instead
+    of failing with ``EADDRINUSE``. Sharing only works when every binder
+    opts in, so setting it here costs nothing when this is the only
+    listener and enables coexistence when it is not.
     """
-    return await open_datagram_endpoint(
-        host,
-        port,
-        remote=False,
-        endpoint_factory=lambda: LocalEndpoint(queue_size),
-        **kwargs,
-    )
+    defaulted_reuse_port = False
+    if hasattr(socket, "SO_REUSEPORT") and "reuse_port" not in kwargs:
+        kwargs["reuse_port"] = True  # type: ignore[assignment]
+        defaulted_reuse_port = True
+    try:
+        return await open_datagram_endpoint(
+            host,
+            port,
+            remote=False,
+            endpoint_factory=lambda: LocalEndpoint(queue_size),
+            **kwargs,
+        )
+    except ValueError:
+        # SO_REUSEPORT can be defined by the socket module yet unimplemented
+        # by the kernel, and asyncio surfaces that as ValueError (not
+        # OSError). Our opt-in default must not break such platforms, so
+        # fall back to an exclusive bind — but only when the default (not an
+        # explicit caller request) enabled the option.
+        if not defaulted_reuse_port:
+            raise
+        kwargs["reuse_port"] = False  # type: ignore[assignment]
+        return await open_datagram_endpoint(
+            host,
+            port,
+            remote=False,
+            endpoint_factory=lambda: LocalEndpoint(queue_size),
+            **kwargs,
+        )
 
 
 async def open_remote_endpoint(
