@@ -596,6 +596,7 @@ source = { editable = "." }
 dependencies = [
     { name = "pint" },
     { name = "psychrolib" },
+    { name = "typing-extensions" },
 ]
 
 [package.dev-dependencies]
@@ -608,13 +609,13 @@ dev = [
     { name = "pytest-timeout" },
     { name = "ruff" },
     { name = "tox" },
-    { name = "typing-extensions" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pint", specifier = ">=0.24" },
     { name = "psychrolib", specifier = ">=2.5.0" },
+    { name = "typing-extensions", specifier = ">=4.15.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -627,7 +628,6 @@ dev = [
     { name = "pytest-timeout", specifier = ">=2.4.0,<3" },
     { name = "ruff", specifier = ">=0.16,<0.17" },
     { name = "tox", specifier = ">=4.34.1,<5" },
-    { name = "typing-extensions", specifier = ">=4.15.0" },
 ]
 
 [[package]]
