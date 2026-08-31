@@ -110,6 +110,7 @@ async def test_address_in_use_real_bind() -> None:
         with pytest.raises(AddressInUseError):
             await listener.start_listening()
     finally:
+        await listener.stop_listening()
         sock.close()
 
 
